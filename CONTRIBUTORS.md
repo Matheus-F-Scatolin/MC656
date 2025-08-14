@@ -1,5 +1,4 @@
-Andriano Ribeiro Franulovic Campoz (RA173253)
-Nome do Fulano  (RAXXXXX)
+Adriano Ribeiro Franulovic Campos (RA173253)
+Pietro Fernandes Magaldi (RA236842)
 Matheus Ferracciú Scatolin  (RA252099)
-Nome do Fulano  (RAXXXXX)
-Nome do Fulano  (RAXXXXX)
+Giovani Mambrim Leme  (RA215041)
