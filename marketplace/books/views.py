@@ -1,0 +1,50 @@
+from django.shortcuts import render, redirect
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
+from .models import Book
+import json
+
+# Create your views here.
+
+def book_list(request):
+    """View to display all available books."""
+    books = Book.objects.all()
+    return render(request, 'books/book_list.html', {'books': books})
+
+def register_book(request):
+    """View to register a new book."""
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        author = request.POST.get('author')
+        course = request.POST.get('course')
+        
+        if title and author and course:
+            book = Book.objects.create(
+                title=title,
+                author=author,
+                course=course
+            )
+            return redirect('book_list')
+        else:
+            error_message = "All fields are required."
+            return render(request, 'books/register_book.html', {'error': error_message})
+    
+    return render(request, 'books/register_book.html')
+
+@csrf_exempt
+@require_http_methods(["GET"])
+def book_list_api(request):
+    """API endpoint to return all books as JSON."""
+    books = Book.objects.all()
+    book_data = []
+    for book in books:
+        book_data.append({
+            'id': book.id,
+            'title': book.title,
+            'author': book.author,
+            'course': book.course,
+            'created_at': book.created_at.isoformat(),
+            'updated_at': book.updated_at.isoformat(),
+        })
+    return JsonResponse({'books': book_data})

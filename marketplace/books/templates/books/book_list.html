@@ -1,0 +1,32 @@
+{% extends 'books/base.html' %}
+
+{% block title %}Available Books - University Book Marketplace{% endblock %}
+
+{% block content %}
+<h2>Available Books</h2>
+
+{% if books %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; margin-top: 1rem;">
+        {% for book in books %}
+            <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-left: 4px solid #007bff;">
+                <h3 style="margin-top: 0; color: #007bff;">{{ book.title }}</h3>
+                <p style="margin: 0.5rem 0;"><strong>Author:</strong> {{ book.author }}</p>
+                <p style="margin: 0.5rem 0;"><strong>Course:</strong> {{ book.course }}</p>
+                <p style="margin: 0.5rem 0; color: #6c757d; font-size: 0.9rem;">
+                    <strong>Registered:</strong> {{ book.created_at|date:"M d, Y" }}
+                </p>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div style="text-align: center; padding: 3rem; background: white; border-radius: 8px; margin-top: 1rem;">
+        <h3 style="color: #6c757d;">No books available yet</h3>
+        <p style="color: #6c757d;">Be the first to register a book!</p>
+        <a href="{% url 'register_book' %}" class="btn btn-success">Register a Book</a>
+    </div>
+{% endif %}
+
+<div style="margin-top: 2rem; text-align: center;">
+    <a href="{% url 'register_book' %}" class="btn btn-success">Register New Book</a>
+</div>
+{% endblock %}
