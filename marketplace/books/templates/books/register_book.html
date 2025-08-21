@@ -1,0 +1,47 @@
+{% extends 'books/base.html' %}
+
+{% block title %}Register Book - University Book Marketplace{% endblock %}
+
+{% block content %}
+<h2>Register a New Book</h2>
+
+{% if error %}
+    <div class="alert alert-danger">
+        {{ error }}
+    </div>
+{% endif %}
+
+<form method="post" style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); max-width: 600px;">
+    {% csrf_token %}
+    
+    <div style="margin-bottom: 1rem;">
+        <label for="title" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Book Title:</label>
+        <input type="text" id="title" name="title" required 
+               style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;"
+               placeholder="Enter the book title">
+    </div>
+    
+    <div style="margin-bottom: 1rem;">
+        <label for="author" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Author:</label>
+        <input type="text" id="author" name="author" required 
+               style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;"
+               placeholder="Enter the author's name">
+    </div>
+    
+    <div style="margin-bottom: 1.5rem;">
+        <label for="course" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Related Course:</label>
+        <input type="text" id="course" name="course" required 
+               style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;"
+               placeholder="Enter the university course (e.g., Computer Science 101)">
+    </div>
+    
+    <div style="text-align: center;">
+        <button type="submit" class="btn btn-success" style="margin-right: 1rem;">Register Book</button>
+        <a href="{% url 'book_list' %}" class="btn">Cancel</a>
+    </div>
+</form>
+
+<div style="margin-top: 2rem; text-align: center;">
+    <a href="{% url 'book_list' %}" style="color: #007bff; text-decoration: none;">← Back to Book List</a>
+</div>
+{% endblock %}
