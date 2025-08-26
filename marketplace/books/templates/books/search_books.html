@@ -1,0 +1,66 @@
+{% extends 'books/base.html' %}
+
+{% block title %}Search Books - University Book Marketplace{% endblock %}
+
+{% block content %}
+<h2>Search Books</h2>
+
+<div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+    <form method="get" style="display: flex; gap: 1rem; align-items: end;">
+        <div style="flex: 1;">
+            <label for="q" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Search by title, author, or course:</label>
+            <input type="text" 
+                   id="q" 
+                   name="q" 
+                   value="{{ query }}" 
+                   placeholder="Enter search terms..." 
+                   style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;"
+                   required>
+        </div>
+        <button type="submit" class="btn" style="white-space: nowrap;">Search Books</button>
+    </form>
+</div>
+
+{% if query %}
+    <div style="margin-bottom: 1rem;">
+        <h3 style="color: #007bff;">
+            {% if books %}
+                Found {{ books|length }} book{{ books|length|pluralize }} for "{{ query }}"
+            {% else %}
+                No books found for "{{ query }}"
+            {% endif %}
+        </h3>
+    </div>
+
+    {% if books %}
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem;">
+            {% for book in books %}
+                <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-left: 4px solid #28a745;">
+                    <h3 style="margin-top: 0; color: #28a745;">{{ book.title }}</h3>
+                    <p style="margin: 0.5rem 0;"><strong>Author:</strong> {{ book.author }}</p>
+                    <p style="margin: 0.5rem 0;"><strong>Course:</strong> {{ book.course }}</p>
+                    <p style="margin: 0.5rem 0; color: #6c757d; font-size: 0.9rem;">
+                        <strong>Registered:</strong> {{ book.created_at|date:"M d, Y" }}
+                    </p>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 3rem; background: white; border-radius: 8px;">
+            <h3 style="color: #6c757d;">No books found matching your search</h3>
+            <p style="color: #6c757d;">Try different search terms or browse all available books.</p>
+            <a href="{% url 'book_list' %}" class="btn">Browse All Books</a>
+        </div>
+    {% endif %}
+{% else %}
+    <div style="text-align: center; padding: 3rem; background: white; border-radius: 8px;">
+        <h3 style="color: #6c757d;">Search for Books</h3>
+        <p style="color: #6c757d;">Enter a title, author name, or course to find books in our marketplace.</p>
+    </div>
+{% endif %}
+
+<div style="margin-top: 2rem; text-align: center;">
+    <a href="{% url 'book_list' %}" class="btn">Browse All Books</a>
+    <a href="{% url 'register_book' %}" class="btn btn-success" style="margin-left: 1rem;">Register New Book</a>
+</div>
+{% endblock %}
