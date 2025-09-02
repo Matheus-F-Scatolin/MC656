@@ -1,0 +1,47 @@
+{% extends 'books/base.html' %}
+
+{% block title %}Log In - University Book Marketplace{% endblock %}
+
+{% block content %}
+<div style="max-width: 500px; margin: 0 auto;">
+    <h2 style="color: #007bff; margin-bottom: 1.5rem;">Log In</h2>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    {% if error %}
+        <div class="alert alert-danger">
+            {{ error }}
+        </div>
+    {% endif %}
+    
+    <form method="post" style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        {% csrf_token %}
+        
+        <div style="margin-bottom: 1rem;">
+            <label for="username" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Username:</label>
+            <input type="text" id="username" name="username" required 
+                   style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+        </div>
+        
+        <div style="margin-bottom: 2rem;">
+            <label for="password" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Password:</label>
+            <input type="password" id="password" name="password" required 
+                   style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+        </div>
+        
+        <button type="submit" class="btn" style="width: 100%; margin-bottom: 1rem;">
+            Log In
+        </button>
+        
+        <div style="text-align: center;">
+            <p>Don't have an account? <a href="{% url 'signup' %}" style="color: #007bff;">Sign up here</a></p>
+        </div>
+    </form>
+</div>
+{% endblock %}
