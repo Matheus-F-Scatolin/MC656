@@ -19,6 +19,7 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('accounts/', include('accounts.urls')),
     path('books/', include('books.urls')),
-    path('', include('books.urls')),  # Make books the default app
+    path('', include('accounts.urls')),  # Make landing page the default
 ]

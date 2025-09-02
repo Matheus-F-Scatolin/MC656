@@ -3,64 +3,218 @@
 {% block title %}Search Books - University Book Marketplace{% endblock %}
 
 {% block content %}
-<h2>Search Books</h2>
-
-<div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 2rem;">
-    <form method="get" style="display: flex; gap: 1rem; align-items: end;">
-        <div style="flex: 1;">
-            <label for="q" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Search by title, author, or course:</label>
-            <input type="text" 
-                   id="q" 
-                   name="q" 
-                   value="{{ query }}" 
-                   placeholder="Enter search terms..." 
-                   style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;"
-                   required>
+<div style="margin-bottom: 2rem;">
+    <h2 style="color: #007bff;">Search Books</h2>
+    
+    <!-- Search Form -->
+    <form method="get" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+        <div style="display: flex; gap: 1rem; align-items: center;">
+            <input type="text" name="q" id="search-input" value="{{ query }}" placeholder="Search by title, author, or course..." 
+                   style="flex: 1; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+            <button type="submit" class="btn" style="white-space: nowrap;">
+                🔍 Search
+            </button>
+            {% if query %}
+                <a href="{% url 'search_books' %}" class="btn" style="background-color: #6c757d; white-space: nowrap;">
+                    Clear
+                </a>
+            {% endif %}
         </div>
-        <button type="submit" class="btn" style="white-space: nowrap;">Search Books</button>
     </form>
+
+    <!-- Search Results -->
+    <div id="search-results">
+        {% if query %}
+            <h3 style="color: #333; margin-bottom: 1rem;">
+                Search results for "{{ query }}" (<span id="results-count">{{ books|length }}</span> book{{ books|length|pluralize }} found)
+            </h3>
+        {% else %}
+            <h3 style="color: #333; margin-bottom: 1rem;">
+                All Books (<span id="results-count">{{ books|length }}</span> book{{ books|length|pluralize }})
+            </h3>
+        {% endif %}
+    </div>
 </div>
 
-{% if query %}
-    <div style="margin-bottom: 1rem;">
-        <h3 style="color: #007bff;">
-            {% if books %}
-                Found {{ books|length }} book{{ books|length|pluralize }} for "{{ query }}"
-            {% else %}
-                No books found for "{{ query }}"
-            {% endif %}
-        </h3>
+{% if books %}
+    <div id="books-container" class="books-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;">
+        {% for book in books %}
+            <div class="book-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-left: 4px solid #007bff;">
+                <h3 style="color: #007bff; margin: 0 0 0.5rem 0; font-size: 1.2rem;">{{ book.title }}</h3>
+                <p style="margin: 0.5rem 0; color: #666;">
+                    <strong>Author:</strong> {{ book.author }}
+                </p>
+                <p style="margin: 0.5rem 0; color: #666;">
+                    <strong>Course:</strong> {{ book.course }}
+                </p>
+                <p style="margin: 0.5rem 0; color: #888; font-size: 0.9rem;">
+                    Added on {{ book.created_at|date:"M d, Y" }}
+                </p>
+            </div>
+        {% endfor %}
     </div>
-
-    {% if books %}
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem;">
-            {% for book in books %}
-                <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-left: 4px solid #28a745;">
-                    <h3 style="margin-top: 0; color: #28a745;">{{ book.title }}</h3>
-                    <p style="margin: 0.5rem 0;"><strong>Author:</strong> {{ book.author }}</p>
-                    <p style="margin: 0.5rem 0;"><strong>Course:</strong> {{ book.course }}</p>
-                    <p style="margin: 0.5rem 0; color: #6c757d; font-size: 0.9rem;">
-                        <strong>Registered:</strong> {{ book.created_at|date:"M d, Y" }}
-                    </p>
-                </div>
-            {% endfor %}
-        </div>
-    {% else %}
-        <div style="text-align: center; padding: 3rem; background: white; border-radius: 8px;">
-            <h3 style="color: #6c757d;">No books found matching your search</h3>
-            <p style="color: #6c757d;">Try different search terms or browse all available books.</p>
-            <a href="{% url 'book_list' %}" class="btn">Browse All Books</a>
-        </div>
-    {% endif %}
 {% else %}
-    <div style="text-align: center; padding: 3rem; background: white; border-radius: 8px;">
-        <h3 style="color: #6c757d;">Search for Books</h3>
-        <p style="color: #6c757d;">Enter a title, author name, or course to find books in our marketplace.</p>
+    <div id="books-container" style="text-align: center; padding: 3rem; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        {% if query %}
+            <h3 style="color: #666;">No books found matching "{{ query }}"</h3>
+            <p style="color: #888;">Try searching with different keywords or <a href="{% url 'search_books' %}" style="color: #007bff;">browse all books</a>.</p>
+        {% else %}
+            <h3 style="color: #666;">No books available yet</h3>
+            <p style="color: #888;">Be the first to <a href="{% url 'register_book' %}" style="color: #007bff;">register a book</a>!</p>
+        {% endif %}
     </div>
 {% endif %}
 
-<div style="margin-top: 2rem; text-align: center;">
-    <a href="{% url 'book_list' %}" class="btn">Browse All Books</a>
-    <a href="{% url 'register_book' %}" class="btn btn-success" style="margin-left: 1rem;">Register New Book</a>
-</div>
+<style>
+    .book-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        transition: all 0.3s ease;
+    }
+    
+    .books-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .loading {
+        opacity: 0.6;
+        pointer-events: none;
+    }
+    
+    @media (max-width: 768px) {
+        .books-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        form > div {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        form button, form a {
+            width: 100%;
+        }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('search-input');
+    const searchResults = document.getElementById('search-results');
+    const booksContainer = document.getElementById('books-container');
+    const resultsCount = document.getElementById('results-count');
+    
+    let searchTimeout;
+    
+    // Function to format date
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric' 
+        });
+    }
+    
+    // Function to render books
+    function renderBooks(books, query) {
+        if (books.length === 0) {
+            booksContainer.innerHTML = `
+                <div style="text-align: center; padding: 3rem; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    ${query ? 
+                        `<h3 style="color: #666;">No books found matching "${query}"</h3>
+                         <p style="color: #888;">Try searching with different keywords or <a href="/books/search/" style="color: #007bff;">browse all books</a>.</p>` :
+                        `<h3 style="color: #666;">No books available yet</h3>
+                         <p style="color: #888;">Be the first to <a href="/books/register/" style="color: #007bff;">register a book</a>!</p>`
+                    }
+                </div>
+            `;
+        } else {
+            booksContainer.className = 'books-grid';
+            booksContainer.innerHTML = books.map(book => `
+                <div class="book-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-left: 4px solid #007bff;">
+                    <h3 style="color: #007bff; margin: 0 0 0.5rem 0; font-size: 1.2rem;">${book.title}</h3>
+                    <p style="margin: 0.5rem 0; color: #666;">
+                        <strong>Author:</strong> ${book.author}
+                    </p>
+                    <p style="margin: 0.5rem 0; color: #666;">
+                        <strong>Course:</strong> ${book.course}
+                    </p>
+                    <p style="margin: 0.5rem 0; color: #888; font-size: 0.9rem;">
+                        Added on ${formatDate(book.created_at)}
+                    </p>
+                </div>
+            `).join('');
+        }
+    }
+    
+    // Function to update search results header
+    function updateSearchHeader(query, count) {
+        if (query) {
+            searchResults.innerHTML = `
+                <h3 style="color: #333; margin-bottom: 1rem;">
+                    Search results for "${query}" (<span id="results-count">${count}</span> book${count !== 1 ? 's' : ''} found)
+                </h3>
+            `;
+        } else {
+            searchResults.innerHTML = `
+                <h3 style="color: #333; margin-bottom: 1rem;">
+                    All Books (<span id="results-count">${count}</span> book${count !== 1 ? 's' : ''})
+                </h3>
+            `;
+        }
+    }
+    
+    // Function to perform search
+    function performSearch(query) {
+        // Add loading state
+        booksContainer.classList.add('loading');
+        
+        fetch(`/books/api/search/?q=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => {
+                renderBooks(data.books, query);
+                updateSearchHeader(query, data.count);
+                
+                // Remove loading state
+                booksContainer.classList.remove('loading');
+                
+                // Update URL without reloading the page
+                const url = new URL(window.location);
+                if (query) {
+                    url.searchParams.set('q', query);
+                } else {
+                    url.searchParams.delete('q');
+                }
+                window.history.replaceState({}, '', url);
+            })
+            .catch(error => {
+                console.error('Search error:', error);
+                booksContainer.classList.remove('loading');
+            });
+    }
+    
+    // Real-time search on input
+    searchInput.addEventListener('input', function() {
+        const query = this.value.trim();
+        
+        // Clear previous timeout
+        clearTimeout(searchTimeout);
+        
+        // Set new timeout for debounced search
+        searchTimeout = setTimeout(() => {
+            performSearch(query);
+        }, 300); // 300ms delay
+    });
+    
+    // Prevent form submission when using real-time search
+    const searchForm = searchInput.closest('form');
+    searchForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        performSearch(searchInput.value.trim());
+    });
+});
+</script>
 {% endblock %}

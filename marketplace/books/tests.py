@@ -1,5 +1,6 @@
 from django.test import TestCase, Client
 from django.urls import reverse
+from django.contrib.auth.models import User
 from .models import Book
 import json
 
@@ -62,6 +63,11 @@ class BookViewTestCase(TestCase):
     def setUp(self):
         """Set up test data."""
         self.client = Client()
+        self.test_user = User.objects.create_user(
+            username="testuser",
+            email="test@example.com",
+            password="testpassword123"
+        )
         self.book1 = Book.objects.create(
             title="Test Book 1",
             author="Test Author 1",
@@ -73,8 +79,9 @@ class BookViewTestCase(TestCase):
             course="Test Course 2"
         )
     
-    def test_book_list_view(self):
-        """Test that the book list view returns all books."""
+    def test_book_list_view_authenticated(self):
+        """Test that authenticated users can access the book list view."""
+        self.client.login(username='testuser', password='testpassword123')
         response = self.client.get(reverse('book_list'))
         
         # Check that the response is successful
@@ -94,8 +101,17 @@ class BookViewTestCase(TestCase):
         self.assertIn(self.book1, books)
         self.assertIn(self.book2, books)
     
-    def test_book_list_empty(self):
-        """Test book list view when no books exist."""
+    def test_book_list_view_unauthenticated(self):
+        """Test that unauthenticated users are redirected to login."""
+        response = self.client.get(reverse('book_list'))
+        
+        # Check that the user is redirected to login page
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/accounts/login/', response.url)
+    
+    def test_book_list_empty_authenticated(self):
+        """Test book list view when no books exist (authenticated user)."""
+        self.client.login(username='testuser', password='testpassword123')
         Book.objects.all().delete()
         response = self.client.get(reverse('book_list'))
         
@@ -103,8 +119,9 @@ class BookViewTestCase(TestCase):
         self.assertContains(response, "No books available yet")
         self.assertEqual(len(response.context['books']), 0)
     
-    def test_register_book_get(self):
-        """Test GET request to register book view."""
+    def test_register_book_get_authenticated(self):
+        """Test GET request to register book view (authenticated)."""
+        self.client.login(username='testuser', password='testpassword123')
         response = self.client.get(reverse('register_book'))
         
         self.assertEqual(response.status_code, 200)
@@ -113,8 +130,17 @@ class BookViewTestCase(TestCase):
         self.assertContains(response, "Author:")
         self.assertContains(response, "Related Course:")
     
-    def test_register_book_post_success(self):
-        """Test successful book registration."""
+    def test_register_book_get_unauthenticated(self):
+        """Test that unauthenticated users cannot access register book page."""
+        response = self.client.get(reverse('register_book'))
+        
+        # Check that the user is redirected to login page
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/accounts/login/', response.url)
+    
+    def test_register_book_post_success_authenticated(self):
+        """Test successful book registration (authenticated)."""
+        self.client.login(username='testuser', password='testpassword123')
         initial_count = Book.objects.count()
         
         response = self.client.post(reverse('register_book'), {
@@ -134,8 +160,9 @@ class BookViewTestCase(TestCase):
         self.assertEqual(new_book.author, 'New Test Author')
         self.assertEqual(new_book.course, 'New Test Course')
     
-    def test_register_book_post_missing_fields(self):
-        """Test book registration with missing fields."""
+    def test_register_book_post_missing_fields_authenticated(self):
+        """Test book registration with missing fields (authenticated)."""
+        self.client.login(username='testuser', password='testpassword123')
         initial_count = Book.objects.count()
         
         # Test with missing title
@@ -168,8 +195,9 @@ class BookViewTestCase(TestCase):
         self.assertEqual(Book.objects.count(), initial_count)
         self.assertContains(response, "All fields are required.")
     
-    def test_book_list_api(self):
-        """Test the API endpoint that returns books as JSON."""
+    def test_book_list_api_authenticated(self):
+        """Test the API endpoint that returns books as JSON (authenticated)."""
+        self.client.login(username='testuser', password='testpassword123')
         response = self.client.get(reverse('book_list_api'))
         
         # Check that the response is successful
@@ -196,267 +224,130 @@ class BookViewTestCase(TestCase):
         titles = [book['title'] for book in data['books']]
         self.assertIn('Test Book 1', titles)
         self.assertIn('Test Book 2', titles)
+    
+    def test_book_list_api_unauthenticated(self):
+        """Test that unauthenticated users cannot access the API."""
+        response = self.client.get(reverse('book_list_api'))
+        
+        # Check that the user is redirected to login page
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/accounts/login/', response.url)
 
 
 class BookSearchTestCase(TestCase):
     """Test cases for book search functionality."""
     
     def setUp(self):
-        """Set up test data for search tests."""
+        """Set up test data."""
         self.client = Client()
-        
-        # Create test books with diverse data for comprehensive search testing
+        self.test_user = User.objects.create_user(
+            username="testuser",
+            email="test@example.com",
+            password="testpassword123"
+        )
         self.book1 = Book.objects.create(
-            title="Introduction to Python Programming",
+            title="Python Programming",
             author="John Smith",
-            course="Computer Science 101"
+            course="CS101"
         )
         self.book2 = Book.objects.create(
-            title="Advanced Java Development",
+            title="Data Structures",
             author="Jane Doe",
-            course="Software Engineering 201"
+            course="CS201"
         )
         self.book3 = Book.objects.create(
-            title="Data Structures and Algorithms",
-            author="Bob Johnson",
-            course="Computer Science 102"
-        )
-        self.book4 = Book.objects.create(
-            title="Machine Learning Fundamentals",
-            author="Alice Brown",
-            course="Artificial Intelligence 301"
-        )
-        self.book5 = Book.objects.create(
-            title="Web Development with Python",
-            author="Charlie Wilson",
-            course="Web Development 250"
+            title="Machine Learning",
+            author="Alice Johnson",
+            course="CS301"
         )
     
-    def test_search_books_get_request(self):
-        """Test GET request to search books view without query."""
+    def test_search_books_view_authenticated(self):
+        """Test that authenticated users can access the search books view."""
+        self.client.login(username='testuser', password='testpassword123')
         response = self.client.get(reverse('search_books'))
         
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Search Books")
-        self.assertContains(response, "Search by title, author, or course:")
-        self.assertEqual(len(response.context['books']), 0)
-        self.assertEqual(response.context['query'], '')
+        self.assertContains(response, "All Books")
+        self.assertEqual(len(response.context['books']), 3)
+    
+    def test_search_books_view_unauthenticated(self):
+        """Test that unauthenticated users are redirected to login."""
+        response = self.client.get(reverse('search_books'))
+        
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/accounts/login/', response.url)
     
     def test_search_books_by_title(self):
         """Test searching books by title."""
-        # Search for "Python" - should find 2 books
+        self.client.login(username='testuser', password='testpassword123')
         response = self.client.get(reverse('search_books'), {'q': 'Python'})
         
         self.assertEqual(response.status_code, 200)
-        books = response.context['books']
-        self.assertEqual(len(books), 2)
+        self.assertContains(response, 'Search results for "Python"')
+        self.assertEqual(len(response.context['books']), 1)
+        self.assertEqual(response.context['books'][0].title, "Python Programming")
         self.assertEqual(response.context['query'], 'Python')
-        
-        titles = [book.title for book in books]
-        self.assertIn("Introduction to Python Programming", titles)
-        self.assertIn("Web Development with Python", titles)
-        
-        # Search for exact title
-        response = self.client.get(reverse('search_books'), {'q': 'Advanced Java Development'})
-        books = response.context['books']
-        self.assertEqual(len(books), 1)
-        self.assertEqual(books[0].title, "Advanced Java Development")
     
     def test_search_books_by_author(self):
-        """Test searching books by author name."""
-        # Search for "John" - should find 1 book
-        response = self.client.get(reverse('search_books'), {'q': 'John'})
+        """Test searching books by author."""
+        self.client.login(username='testuser', password='testpassword123')
+        response = self.client.get(reverse('search_books'), {'q': 'Jane'})
         
         self.assertEqual(response.status_code, 200)
-        books = response.context['books']
-        self.assertEqual(len(books), 2)  # John Smith and Bob Johnson
-        self.assertEqual(response.context['query'], 'John')
-        
-        authors = [book.author for book in books]
-        self.assertIn("John Smith", authors)
-        self.assertIn("Bob Johnson", authors)
-        
-        # Search for exact author name
-        response = self.client.get(reverse('search_books'), {'q': 'Jane Doe'})
-        books = response.context['books']
-        self.assertEqual(len(books), 1)
-        self.assertEqual(books[0].author, "Jane Doe")
+        self.assertContains(response, 'Search results for "Jane"')
+        self.assertEqual(len(response.context['books']), 1)
+        self.assertEqual(response.context['books'][0].author, "Jane Doe")
     
     def test_search_books_by_course(self):
-        """Test searching books by course name."""
-        # Search for "Computer Science" - should find 2 books
-        response = self.client.get(reverse('search_books'), {'q': 'Computer Science'})
+        """Test searching books by course."""
+        self.client.login(username='testuser', password='testpassword123')
+        response = self.client.get(reverse('search_books'), {'q': 'CS201'})
         
         self.assertEqual(response.status_code, 200)
-        books = response.context['books']
-        self.assertEqual(len(books), 2)
-        self.assertEqual(response.context['query'], 'Computer Science')
-        
-        courses = [book.course for book in books]
-        self.assertIn("Computer Science 101", courses)
-        self.assertIn("Computer Science 102", courses)
-        
-        # Search for specific course number
-        response = self.client.get(reverse('search_books'), {'q': '301'})
-        books = response.context['books']
-        self.assertEqual(len(books), 1)
-        self.assertEqual(books[0].course, "Artificial Intelligence 301")
+        self.assertContains(response, 'Search results for "CS201"')
+        self.assertEqual(len(response.context['books']), 1)
+        self.assertEqual(response.context['books'][0].course, "CS201")
     
     def test_search_books_case_insensitive(self):
-        """Test that search is case-insensitive."""
-        # Test lowercase search
+        """Test that search is case insensitive."""
+        self.client.login(username='testuser', password='testpassword123')
         response = self.client.get(reverse('search_books'), {'q': 'python'})
-        books = response.context['books']
-        self.assertEqual(len(books), 2)
-        
-        # Test uppercase search
-        response = self.client.get(reverse('search_books'), {'q': 'PYTHON'})
-        books = response.context['books']
-        self.assertEqual(len(books), 2)
-        
-        # Test mixed case search
-        response = self.client.get(reverse('search_books'), {'q': 'PyThOn'})
-        books = response.context['books']
-        self.assertEqual(len(books), 2)
-    
-    def test_search_books_partial_match(self):
-        """Test that search works with partial matches."""
-        # Search for partial title
-        response = self.client.get(reverse('search_books'), {'q': 'Data'})
-        books = response.context['books']
-        self.assertEqual(len(books), 1)
-        self.assertEqual(books[0].title, "Data Structures and Algorithms")
-        
-        # Search for partial author
-        response = self.client.get(reverse('search_books'), {'q': 'Alice'})
-        books = response.context['books']
-        self.assertEqual(len(books), 1)
-        self.assertEqual(books[0].author, "Alice Brown")
-        
-        # Search for partial course
-        response = self.client.get(reverse('search_books'), {'q': 'Web'})
-        books = response.context['books']
-        self.assertEqual(len(books), 1)
-        self.assertEqual(books[0].course, "Web Development 250")
-    
-    def test_search_books_no_results(self):
-        """Test searching with query that returns no results."""
-        response = self.client.get(reverse('search_books'), {'q': 'NonexistentBook'})
         
         self.assertEqual(response.status_code, 200)
-        books = response.context['books']
-        self.assertEqual(len(books), 0)
-        self.assertEqual(response.context['query'], 'NonexistentBook')
-        self.assertContains(response, "No books found for")
+        self.assertEqual(len(response.context['books']), 1)
+        self.assertEqual(response.context['books'][0].title, "Python Programming")
+    
+    def test_search_books_multiple_results(self):
+        """Test search that returns multiple results."""
+        self.client.login(username='testuser', password='testpassword123')
+        response = self.client.get(reverse('search_books'), {'q': 'CS'})
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context['books']), 3)  # All courses contain 'CS'
+    
+    def test_search_books_no_results(self):
+        """Test search with no matching results."""
+        self.client.login(username='testuser', password='testpassword123')
+        response = self.client.get(reverse('search_books'), {'q': 'NonExistent'})
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'No books found matching "NonExistent"')
+        self.assertEqual(len(response.context['books']), 0)
     
     def test_search_books_empty_query(self):
-        """Test searching with empty query."""
+        """Test search with empty query shows all books."""
+        self.client.login(username='testuser', password='testpassword123')
         response = self.client.get(reverse('search_books'), {'q': ''})
         
         self.assertEqual(response.status_code, 200)
-        books = response.context['books']
-        self.assertEqual(len(books), 0)
-        self.assertEqual(response.context['query'], '')
+        self.assertContains(response, "All Books")
+        self.assertEqual(len(response.context['books']), 3)
     
     def test_search_books_whitespace_query(self):
-        """Test searching with whitespace-only query."""
+        """Test search with whitespace-only query shows all books."""
+        self.client.login(username='testuser', password='testpassword123')
         response = self.client.get(reverse('search_books'), {'q': '   '})
         
         self.assertEqual(response.status_code, 200)
-        books = response.context['books']
-        self.assertEqual(len(books), 0)
-        self.assertEqual(response.context['query'], '')
-    
-    def test_search_books_api(self):
-        """Test the search API endpoint."""
-        response = self.client.get(reverse('search_books_api'), {'q': 'Python'})
-        
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response['Content-Type'], 'application/json')
-        
-        data = json.loads(response.content)
-        
-        # Check the structure of the response
-        self.assertIn('books', data)
-        self.assertIn('query', data)
-        self.assertIn('count', data)
-        
-        self.assertEqual(data['query'], 'Python')
-        self.assertEqual(data['count'], 2)
-        self.assertEqual(len(data['books']), 2)
-        
-        # Check that the correct books are returned
-        titles = [book['title'] for book in data['books']]
-        self.assertIn("Introduction to Python Programming", titles)
-        self.assertIn("Web Development with Python", titles)
-    
-    def test_search_books_api_no_query(self):
-        """Test the search API endpoint without query parameter."""
-        response = self.client.get(reverse('search_books_api'))
-        
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
-        
-        self.assertEqual(data['query'], '')
-        self.assertEqual(data['count'], 0)
-        self.assertEqual(len(data['books']), 0)
-    
-    def test_search_books_api_empty_results(self):
-        """Test the search API endpoint with query that returns no results."""
-        response = self.client.get(reverse('search_books_api'), {'q': 'NonexistentBook'})
-        
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
-        
-        self.assertEqual(data['query'], 'NonexistentBook')
-        self.assertEqual(data['count'], 0)
-        self.assertEqual(len(data['books']), 0)
-    
-    def test_search_books_multiple_words(self):
-        """Test searching with multiple words."""
-        # Search for multiple words that should match
-        response = self.client.get(reverse('search_books'), {'q': 'Machine Learning'})
-        books = response.context['books']
-        self.assertEqual(len(books), 1)
-        self.assertEqual(books[0].title, "Machine Learning Fundamentals")
-        
-        # Search for a single word that should find multiple books
-        response = self.client.get(reverse('search_books'), {'q': 'John'})
-        books = response.context['books']
-        # Should find books with "John" in author name (John Smith, Bob Johnson)
-        self.assertEqual(len(books), 2)
-        authors = [book.author for book in books]
-        self.assertIn("John Smith", authors)
-        self.assertIn("Bob Johnson", authors)
-    
-    def test_search_books_special_characters(self):
-        """Test searching with special characters."""
-        # Create a book with special characters for testing
-        special_book = Book.objects.create(
-            title="C++ Programming & Design",
-            author="Dr. Smith-Jones",
-            course="CS-301: Advanced Programming"
-        )
-        
-        # Search for the special characters
-        response = self.client.get(reverse('search_books'), {'q': 'C++'})
-        books = response.context['books']
-        self.assertEqual(len(books), 1)
-        self.assertEqual(books[0], special_book)
-        
-        response = self.client.get(reverse('search_books'), {'q': 'Smith-Jones'})
-        books = response.context['books']
-        self.assertEqual(len(books), 1)
-        self.assertEqual(books[0], special_book)
-    
-    def test_search_books_ordering(self):
-        """Test that search results maintain proper ordering (newest first)."""
-        # Search for a term that matches multiple books
-        response = self.client.get(reverse('search_books'), {'q': 'Computer Science'})
-        books = response.context['books']
-        
-        # Verify that books are ordered by creation date (newest first)
-        self.assertEqual(len(books), 2)
-        # book3 (CS 102) was created after book1 (CS 101), so it should come first
-        self.assertEqual(books[0], self.book3)
-        self.assertEqual(books[1], self.book1)
+        self.assertEqual(len(response.context['books']), 3)

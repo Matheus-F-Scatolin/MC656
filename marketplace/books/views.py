@@ -2,17 +2,44 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from .models import Book
 import json
 
 # Create your views here.
 
+@login_required
 def book_list(request):
     """View to display all available books."""
     books = Book.objects.all()
     return render(request, 'books/book_list.html', {'books': books})
 
+@login_required
+def search_books(request):
+    """View to search for books based on query parameters."""
+    query = request.GET.get('q', '').strip()
+    books = []
+    
+    if query:
+        # Search in title, author, and course fields
+        books = Book.objects.filter(
+            Q(title__icontains=query) |
+            Q(author__icontains=query) |
+            Q(course__icontains=query)
+        ).distinct()
+    else:
+        # If no query, show all books
+        books = Book.objects.all()
+    
+    context = {
+        'books': books,
+        'query': query,
+        'is_search': True
+    }
+    return render(request, 'books/search_books.html', context)
+
+@login_required
 def register_book(request):
     """View to register a new book."""
     if request.method == 'POST':
@@ -35,6 +62,7 @@ def register_book(request):
 
 @csrf_exempt
 @require_http_methods(["GET"])
+@login_required
 def book_list_api(request):
     """API endpoint to return all books as JSON."""
     books = Book.objects.all()
@@ -50,38 +78,23 @@ def book_list_api(request):
         })
     return JsonResponse({'books': book_data})
 
-def search_books(request):
-    """View to search for books by title, author, or course."""
-    query = request.GET.get('q', '').strip()
-    books = []
-    
-    if query:
-        # Search in title, author, or course fields (case-insensitive)
-        books = Book.objects.filter(
-            Q(title__icontains=query) |
-            Q(author__icontains=query) |
-            Q(course__icontains=query)
-        ).distinct()
-    
-    context = {
-        'books': books,
-        'query': query,
-    }
-    return render(request, 'books/search_books.html', context)
-
 @csrf_exempt
 @require_http_methods(["GET"])
+@login_required
 def search_books_api(request):
-    """API endpoint to search for books and return results as JSON."""
+    """API endpoint for real-time book search."""
     query = request.GET.get('q', '').strip()
-    books = []
     
     if query:
+        # Search in title, author, and course fields
         books = Book.objects.filter(
             Q(title__icontains=query) |
             Q(author__icontains=query) |
             Q(course__icontains=query)
         ).distinct()
+    else:
+        # If no query, return all books
+        books = Book.objects.all()
     
     book_data = []
     for book in books:
@@ -91,7 +104,6 @@ def search_books_api(request):
             'author': book.author,
             'course': book.course,
             'created_at': book.created_at.isoformat(),
-            'updated_at': book.updated_at.isoformat(),
         })
     
     return JsonResponse({
