@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "marketplace"
+version = "0.1.0"
+description = "A digital marketplace for trading, loaning and donating books"
+authors = [
+    "Adriano Ribeiro Franulovic Campos <a173253@dac.unicamp.br>",
+    "Giovani Mambrim Leme <g215041@dac.unicamp.br>",
+    "Matheus Ferracciú Scatolin <m252099@dac.unicamp.br>",
+    "Pietro Fernandes Magaldi <p236842@dac.unicamp.br>"
+]
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.14"
+django = "^5.2.6"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0"
+pytest-django = "^4.8"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
