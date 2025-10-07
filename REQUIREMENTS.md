@@ -73,7 +73,7 @@ O que observar / capturar: homepage com blocos “Compre novamente”, “Contin
 Uso observado: recomenda produtos com base em histórico e comportamento.
 UX notes: bom para incentivar a descoberta; pode poluir se houver muitas seções.
 
-![Amazon - Catálogo](images/amazon-catalago.png)
+![Amazon - Catálogo](images/amazon-catalogo.png)
 
 ---
 
