@@ -158,28 +158,28 @@ UX notes: para a plataforma universitária, usar verificação institucional (em
 ### Pontos positivos e negativos  
 
 #### Pontos Positivos:  
-Catálogo e PDP robustos: consolidação de edições/formatos e múltiplas ofertas — inspira como mostrar alternativas (novo/usado/permuta).
-Busca e auto-complete: acelera a descoberta; pré-visualização com capa ajuda muito.
-Filtros detalhados: possibilitam refinar por entrega/condição/preço — adaptar para filtros por curso/semestre/edição.
-Avaliações ricas: estrelas + comentários + fotos aumentam confiança — muito relevante para troca de livros usados.
-Recomendações: identificam livros complementares (úteis para sugerir livros de uma mesma disciplina).
-Mensageria e conta: controle de comunicação e histórico de transações.
+- Catálogo e PDP robustos: consolidação de edições/formatos e múltiplas ofertas — inspira como mostrar alternativas (novo/usado/permuta).
+- Busca e auto-complete: acelera a descoberta; pré-visualização com capa ajuda muito.
+- Filtros detalhados: possibilitam refinar por entrega/condição/preço — adaptar para filtros por curso/semestre/edição.
+- Avaliações ricas: estrelas + comentários + fotos aumentam confiança — muito relevante para troca de livros usados.
+- Recomendações: identificam livros complementares (úteis para sugerir livros de uma mesma disciplina).
+- Mensageria e conta: controle de comunicação e histórico de transações.
  
 #### Pontos Negativos:  
-Excesso de elementos na PDP pode confundir usuários que buscam trocar rapidamente.
-Complexidade de fluxo de venda (Seller Central, logística, taxas) é muito além do necessário para um sistema P2P universitário.
-Dependência de infraestrutura de pagamento e logística — para trocas presenciais entre alunos, simplificar (ou deixar opcional) evita atrito.
-Privacidade / segurança: Amazon é corporativa e possui políticas; replicar sem adaptação pode trazer burocracia desnecessária para um ambiente estudantil.
+- Excesso de elementos na PDP pode confundir usuários que buscam trocar rapidamente.
+- Complexidade de fluxo de venda (Seller Central, logística, taxas) é muito além do necessário para um sistema P2P universitário.
+- Dependência de infraestrutura de pagamento e logística — para trocas presenciais entre alunos, simplificar (ou deixar opcional) evita atrito.
+- Privacidade / segurança: Amazon é corporativa e possui políticas; replicar sem adaptação pode trazer burocracia desnecessária para um ambiente estudantil.
 
 ---
 
 ### Requisitos  
 
 A partir das informações acima, temos alguns requisitos que podemos extrair da análise:  
-Criar fluxo de cadastro simples, mas com verificação institucional (e-mail da universidade).
-Implementar busca em tempo real com pré-visualização (capa + título + edição).
-Oferecer filtros avançados (curso/disciplinas, condição do livro, campus/localidade, preço, disponibilidade).
-Adotar PDP simplificada para trocas (foto, edição, estado, opção “troca por”).
-Implementar mensageria interna com templates e sistema de reputação leve (estrelas + comentário + foto).
-Opção de reserva/calendário para marcar retirada no campus.
-Painel simples para cadastrar/anunciar livro com fotos e campo “troca/venda/doação”.
+- Criar fluxo de cadastro simples, mas com verificação institucional (e-mail da universidade).
+- Implementar busca em tempo real com pré-visualização (capa + título + edição).
+- Oferecer filtros avançados (curso/disciplinas, condição do livro, campus/localidade, preço, disponibilidade).
+- Adotar PDP simplificada para trocas (foto, edição, estado, opção “troca por”).
+- Implementar mensageria interna com templates e sistema de reputação leve (estrelas + comentário + foto).
+- Opção de reserva/calendário para marcar retirada no campus.
+- Painel simples para cadastrar/anunciar livro com fotos e campo “troca/venda/doação”.
