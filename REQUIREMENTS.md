@@ -1,4 +1,4 @@
-# Benchmarking
+<img width="1667" height="748" alt="image" src="https://github.com/user-attachments/assets/c7173eb3-ffa9-4fd4-be58-baa6047c8f59" /># Benchmarking
 
 ## [Skoob](https://www.skoob.com.br)
 
@@ -199,37 +199,37 @@ Nesse site, analisaremos as seguintes funcionalidades: **sistema de busca**, **h
 #### Sistema de busca
 
 O acervus UNICAMP possui um robusto sistema de busca de obras, com vários campos a serem especificados, o que facilita encontrar uma obra específica. É possível especificar o título, autoria, edição, editora, entre outros.
-<IMAGEM>
+![Acervus - Busca](images/acervus-filtros-busca.png)
 Além disso, é possível filtrar as obras por localização, ou seja, por biblioteca, o que possibilita o usuário escolher a biblioteca de preferência.
-<IMAGEM>
+![Acervus - Filtor Biblioteca](images/acervus-filtro-biblio.png)
 
 -
 
 #### Histórico de Empréstimos
 
 A plataforma conta com uma página, dentro do perfil, que mostra todo o histórico de empréstimo de livros, facilitando o controle de empréstimo pelo usuário e a renovação de empréstimos recorrentes.
-<IMAGEM>
+![Acervus - Empréstimos](images/acervus-emprestimos.png)
 
 -
 
 #### Acesso à produção científica
 
 Além de livros acadêmicos e artísticos, também é possível acessar teses e papers a partir da plataforma. Isso permite o sistema abrangir uma maior diversidade de obras, e facilita o acesso de produções científicas aos usuários.
-<IMAGEM>
+![Acervus - Produção científica](images/acervus-prod-cientifica.png)
 
 -
 
 #### Acessibilidade
 
 Um ponto importante sobre o sistema é que ele dispõe de várias opções de acessibilidade, incluindo um modo de alto contraste da página e um modo fácil de mudar o idioma da página.
-<IMAGEM>
+![Acervus - Acessibilidade](images/acervus-acessibilidade.png)
 
 -
 
 #### Feedback de empréstimo
 
 Ao realizar um empréstimo, o usuário recebe feedback em seu e-mail, cadastrado na página de login. Os principais e-mails contém comprovante de reserva, no momento da reserva, recibo de empréstimo, recebido no momento em que a obra foi emprestada, e aviso de devolução, recebido nos dias próximos à data de devolução da obra emprestada. Esse sistema automático de feedback ajuda o usuário a acompanhar o processo de empréstimo e devolver a obra dentro do prazo.
-<IMAGEM>
+![Acervus - Feedback](images/acervus-feedback.png)
 
 ---
 
@@ -252,6 +252,7 @@ Ao realizar um empréstimo, o usuário recebe feedback em seu e-mail, cadastrado
 
 Podemos extrair alguns requisitos a partir dos pontos levantados:
 - Criar página de **histórico de empréstimos** que facilite visualização e renovação
-- Adicionar opções de **acessibilidade** que facilitem o uso da plataforma
+- Adicionar opções de **acessibilidade** que facilitem o uso da plataforma, como idioma da página e modo de alto contraste
 - Assegurar **responsividade** da plataforma a dispositivos mobile
 - Implementar sistema automático de **feedback** sobre empréstimo, lembrando sobre prazo de devolução
+
