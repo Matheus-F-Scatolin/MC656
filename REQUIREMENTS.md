@@ -183,3 +183,75 @@ A partir das informações acima, temos alguns requisitos que podemos extrair da
 - Implementar mensageria interna com templates e sistema de reputação leve (estrelas + comentário + foto).
 - Opção de reserva/calendário para marcar retirada no campus.
 - Painel simples para cadastrar/anunciar livro com fotos e campo “troca/venda/doação”.
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+## Acervus UNICAMP (https://acervus.unicamp.br/)
+
+O Acervus UNICAMP é o acervo digital de obras literárias da UNICAMP. Nele, é possível visualizar novas obras, acessar periódicos e reservar obras de interesse.
+
+Nesse site, analisaremos as seguintes funcionalidades: **sistema de busca**, **histórico de empréstimos**, **acesso à produção científica**, **acessibilidade** e **Feedback de empréstimo**.
+
+---
+
+### Documentação de Features e Funcionalidades 
+
+#### Sistema de busca
+
+O acervus UNICAMP possui um robusto sistema de busca de obras, com vários campos a serem especificados, o que facilita encontrar uma obra específica. É possível especificar o título, autoria, edição, editora, entre outros.
+<IMAGEM>
+Além disso, é possível filtrar as obras por localização, ou seja, por biblioteca, o que possibilita o usuário escolher a biblioteca de preferência.
+<IMAGEM>
+
+-
+
+#### Histórico de Empréstimos
+
+A plataforma conta com uma página, dentro do perfil, que mostra todo o histórico de empréstimo de livros, facilitando o controle de empréstimo pelo usuário e a renovação de empréstimos recorrentes.
+<IMAGEM>
+
+-
+
+#### Acesso à produção científica
+
+Além de livros acadêmicos e artísticos, também é possível acessar teses e papers a partir da plataforma. Isso permite o sistema abrangir uma maior diversidade de obras, e facilita o acesso de produções científicas aos usuários.
+<IMAGEM>
+
+-
+
+#### Acessibilidade
+
+Um ponto importante sobre o sistema é que ele dispõe de várias opções de acessibilidade, incluindo um modo de alto contraste da página e um modo fácil de mudar o idioma da página.
+<IMAGEM>
+
+-
+
+#### Feedback de empréstimo
+
+Ao realizar um empréstimo, o usuário recebe feedback em seu e-mail, cadastrado na página de login. Os principais e-mails contém comprovante de reserva, no momento da reserva, recibo de empréstimo, recebido no momento em que a obra foi emprestada, e aviso de devolução, recebido nos dias próximos à data de devolução da obra emprestada. Esse sistema automático de feedback ajuda o usuário a acompanhar o processo de empréstimo e devolver a obra dentro do prazo.
+<IMAGEM>
+
+---
+
+### Pontos positivos e negativos
+
+#### Pontos positivos:
+- Sistema de busca robusto, com possibilidade de alto detalhamento na busca
+- Alta diversidade de obras
+- Preocupação com acessibilidade
+- Feedback sobre o processo de empréstimo
+
+#### Pontos negativos:
+- Exclusividade de login para discentes e doscentes da UNICAMP
+- Baixa responsividade em aparelhos mobile
+- Demora de atualização de obras disponíveis/reservadas
+
+---
+
+### Requisitos
+
+Podemos extrair alguns requisitos a partir dos pontos levantados:
+- Criar página de **histórico de empréstimos** que facilite visualização e renovação
+- Adicionar opções de **acessibilidade** que facilitem o uso da plataforma
+- Assegurar **responsividade** da plataforma a dispositivos mobile
+- Implementar sistema automático de **feedback** sobre empréstimo, lembrando sobre prazo de devolução
