@@ -203,28 +203,28 @@ O acervus UNICAMP possui um robusto sistema de busca de obras, com vários campo
 Além disso, é possível filtrar as obras por localização, ou seja, por biblioteca, o que possibilita o usuário escolher a biblioteca de preferência.
 ![Acervus - Filtor Biblioteca](images/acervus-filtro-biblio.png)
 
--
+—
 
 #### Histórico de Empréstimos
 
 A plataforma conta com uma página, dentro do perfil, que mostra todo o histórico de empréstimo de livros, facilitando o controle de empréstimo pelo usuário e a renovação de empréstimos recorrentes.
 ![Acervus - Empréstimos](images/acervus-emprestimos.png)
 
--
+—
 
 #### Acesso à produção científica
 
 Além de livros acadêmicos e artísticos, também é possível acessar teses e papers a partir da plataforma. Isso permite o sistema abrangir uma maior diversidade de obras, e facilita o acesso de produções científicas aos usuários.
 ![Acervus - Produção científica](images/acervus-prod-cientifica.png)
 
--
+—
 
 #### Acessibilidade
 
 Um ponto importante sobre o sistema é que ele dispõe de várias opções de acessibilidade, incluindo um modo de alto contraste da página e um modo fácil de mudar o idioma da página.
 ![Acervus - Acessibilidade](images/acervus-acessibilidade.png)
 
--
+—
 
 #### Feedback de empréstimo
 
@@ -255,4 +255,5 @@ Podemos extrair alguns requisitos a partir dos pontos levantados:
 - Adicionar opções de **acessibilidade** que facilitem o uso da plataforma, como idioma da página e modo de alto contraste
 - Assegurar **responsividade** da plataforma a dispositivos mobile
 - Implementar sistema automático de **feedback** sobre empréstimo, lembrando sobre prazo de devolução
+
 
