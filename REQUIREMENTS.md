@@ -97,7 +97,7 @@ UX notes: filtros poderosos — importante replicar filtros relevantes (curso, e
   
 ![Amazon - Resultado da busca](images/amazon-resultado_busca.png)
 
-—
+---
 
 #### Página de detalhe do produto (PDP) — descrição e ações  
 PDP concentra imagem/capas, título, autores, sinopse, formatos disponíveis (Kindle, físico), preço e botões de ação (Adicionar ao carrinho / Comprar agora). Mostra ofertas alternativas (outros vendedores/usado).
@@ -106,7 +106,6 @@ O que observar / capturar: PDP completa (imagem, sinopse, bloco de compra, “ou
 Uso observado: consolida informação sobre edições/formato e múltiplas ofertas.
 UX notes: muito completa — ótima inspiração, porém excessiva para um fluxo de troca simples (pode confundir).
 
-  
 ![Amazon - Página de detalhamento do produto](images/amazon-pdp.png)
 
 ---
@@ -200,8 +199,11 @@ Nesse site, analisaremos as seguintes funcionalidades: **sistema de busca**, **h
 #### Sistema de busca
 
 O acervus UNICAMP possui um robusto sistema de busca de obras, com vários campos a serem especificados, o que facilita encontrar uma obra específica. É possível especificar o título, autoria, edição, editora, entre outros.
+
 ![Acervus - Busca](images/acervus-filtros-busca.png)
+
 Além disso, é possível filtrar as obras por localização, ou seja, por biblioteca, o que possibilita o usuário escolher a biblioteca de preferência.
+
 ![Acervus - Filtor Biblioteca](images/acervus-filtro-biblio.png)
 
 ---
@@ -209,6 +211,7 @@ Além disso, é possível filtrar as obras por localização, ou seja, por bibli
 #### Histórico de Empréstimos
 
 A plataforma conta com uma página, dentro do perfil, que mostra todo o histórico de empréstimo de livros, facilitando o controle de empréstimo pelo usuário e a renovação de empréstimos recorrentes.
+
 ![Acervus - Empréstimos](images/acervus-emprestimos.png)
 
 ---
@@ -216,6 +219,7 @@ A plataforma conta com uma página, dentro do perfil, que mostra todo o históri
 #### Acesso à produção científica
 
 Além de livros acadêmicos e artísticos, também é possível acessar teses e papers a partir da plataforma. Isso permite o sistema abrangir uma maior diversidade de obras, e facilita o acesso de produções científicas aos usuários.
+
 ![Acervus - Produção científica](images/acervus-prod-cientifica.png)
 
 ---
@@ -223,6 +227,7 @@ Além de livros acadêmicos e artísticos, também é possível acessar teses e 
 #### Acessibilidade
 
 Um ponto importante sobre o sistema é que ele dispõe de várias opções de acessibilidade, incluindo um modo de alto contraste da página e um modo fácil de mudar o idioma da página.
+
 ![Acervus - Acessibilidade](images/acervus-acessibilidade.png)
 
 ---
@@ -230,6 +235,7 @@ Um ponto importante sobre o sistema é que ele dispõe de várias opções de ac
 #### Feedback de empréstimo
 
 Ao realizar um empréstimo, o usuário recebe feedback em seu e-mail, cadastrado na página de login. Os principais e-mails contém comprovante de reserva, no momento da reserva, recibo de empréstimo, recebido no momento em que a obra foi emprestada, e aviso de devolução, recebido nos dias próximos à data de devolução da obra emprestada. Esse sistema automático de feedback ajuda o usuário a acompanhar o processo de empréstimo e devolver a obra dentro do prazo.
+
 ![Acervus - Feedback](images/acervus-feedback.png)
 
 ---
@@ -319,7 +325,9 @@ Em seguida, o usuário pode escolher de qual usuário deseja solicitar o livro (
 São exibidas informações sobre o dono do livro, como nome, cidade, estado e último acesso à plataforma.
 Também é possível abrir o perfil completo do dono, onde são exibidas informações como avaliações e livros disponíveis.
 Para concluir a solicitação, o usuário deve estabelecer uma data limite para que o dono aceite a solicitação, e clicar em "Solicitar".
+
 ![Livra_Livro - solicitar_livro](images/livra_livro_solicitacao.png)
+
 Caso o usuário não tenha nenhum ponto (como foi o meu caso), é exibida uma mensagem de erro, e a solitação é impedida.
 Embora bem intencionado, o sistema de pontos é fundamentalmente falho, e acaba sendo um obstáculo praticamente intransponível para o uso da plataforma.
 Isso porque, para ganhar pontos, o usuário precisa:
@@ -334,6 +342,7 @@ como novos pontos entram em circulação? Segundo as FAQs do site,
 a única forma de obtê-los é concluindo uma doação e, ainda por cima, os pontos tem validade de 6 meses.
 Se cada ponto ganho por um usuário é um ponto gasto por outro, e os pontos expiram, o número de pontos
 em circulação tende a diminuir com o tempo, o que torna o sistema insustentável.
+
 ![Livra_Livro - solicitar_livro_sem_pontos](images/livra_livro_sem_pontos.png)
 
 ---
