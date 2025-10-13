@@ -1,4 +1,4 @@
-<img width="1667" height="748" alt="image" src="https://github.com/user-attachments/assets/c7173eb3-ffa9-4fd4-be58-baa6047c8f59" /># Benchmarking
+# Benchmarking
 
 ## [Skoob](https://www.skoob.com.br)
 
@@ -53,7 +53,7 @@ A partir das informações acima, temos alguns requisitos que podemos extrair da
 - Adotar **design mais limpo e moderno**, evitando sobrecarga de informações.  
 - Oferecer **filtros avançados** para busca de livros.  
 
--------------------------------------------------------------------------------------------------------------------------------
+---
 
 
 ## [Amazon](https://www.amazon.com.br)
@@ -109,7 +109,7 @@ UX notes: muito completa — ótima inspiração, porém excessiva para um fluxo
   
 ![Amazon - Página de detalhamento do produto](images/amazon-pdp.png)
 
-—
+---
 
 #### Recomendações relacionadas (frequentemente comprados juntos / vistos juntos)  
 Exposição de produtos relacionados e bundles (frequentemente comprados juntos).
@@ -120,7 +120,7 @@ UX notes: útil para sugerir livros de mesma disciplina ou materiais de referên
   
 ![Amazon - Recomendações relacionadas](images/amazon-recomendacao_relacionada.png)
 
-—
+---
 
 #### Detalhes técnicos do produto  
 Seção com dados técnicos: ISBN-10 / ISBN-13, número de páginas, editora, dimensões, data de publicação.
@@ -131,7 +131,7 @@ UX notes: no marketplace universitário, mostrar edição/ISBN/ano deve ser prio
   
 ![Amazon - Detalhes técnicos do produto](images/amazon-detalhes_produto.png)
 
-—
+---
 
 #### Avaliações do produto (estrelas, comentários e imagens)  
 Sistema de classificação com barra de distribuição por estrelas, comentários textuais e imagens enviadas por compradores.
@@ -142,7 +142,7 @@ UX notes: extremamente útil para reputação; para trocas entre alunos, incorpo
   
 ![Amazon - Avaliação do produto](images/amazon-avaliacao_produto.png)
 
-—
+---
 
 #### Login / criação de conta  
 Fluxo de login simples (e-mail/telefone) antes de prosseguir para ações críticas (contato, compra).
@@ -184,9 +184,10 @@ A partir das informações acima, temos alguns requisitos que podemos extrair da
 - Opção de reserva/calendário para marcar retirada no campus.
 - Painel simples para cadastrar/anunciar livro com fotos e campo “troca/venda/doação”.
 
--------------------------------------------------------------------------------------------------------------------------------
+---
 
-## Acervus UNICAMP (https://acervus.unicamp.br/)
+
+## [Acervus UNICAMP](https://acervus.unicamp.br/)
 
 O Acervus UNICAMP é o acervo digital de obras literárias da UNICAMP. Nele, é possível visualizar novas obras, acessar periódicos e reservar obras de interesse.
 
@@ -203,28 +204,28 @@ O acervus UNICAMP possui um robusto sistema de busca de obras, com vários campo
 Além disso, é possível filtrar as obras por localização, ou seja, por biblioteca, o que possibilita o usuário escolher a biblioteca de preferência.
 ![Acervus - Filtor Biblioteca](images/acervus-filtro-biblio.png)
 
-—
+---
 
 #### Histórico de Empréstimos
 
 A plataforma conta com uma página, dentro do perfil, que mostra todo o histórico de empréstimo de livros, facilitando o controle de empréstimo pelo usuário e a renovação de empréstimos recorrentes.
 ![Acervus - Empréstimos](images/acervus-emprestimos.png)
 
-—
+---
 
 #### Acesso à produção científica
 
 Além de livros acadêmicos e artísticos, também é possível acessar teses e papers a partir da plataforma. Isso permite o sistema abrangir uma maior diversidade de obras, e facilita o acesso de produções científicas aos usuários.
 ![Acervus - Produção científica](images/acervus-prod-cientifica.png)
 
-—
+---
 
 #### Acessibilidade
 
 Um ponto importante sobre o sistema é que ele dispõe de várias opções de acessibilidade, incluindo um modo de alto contraste da página e um modo fácil de mudar o idioma da página.
 ![Acervus - Acessibilidade](images/acervus-acessibilidade.png)
 
-—
+---
 
 #### Feedback de empréstimo
 
@@ -256,4 +257,111 @@ Podemos extrair alguns requisitos a partir dos pontos levantados:
 - Assegurar **responsividade** da plataforma a dispositivos mobile
 - Implementar sistema automático de **feedback** sobre empréstimo, lembrando sobre prazo de devolução
 
+---
 
+## [Livra Livro](https://livralivro.com.br/)
+O Livra Livro é uma plataforma brasileira dedicada à doação e troca de livros usados. 
+O serviço é baseado em um sistema de pontos, no qual os usuários ganham pontos ao doar livros e gastam-nos para solicitar livros oferecidos por outros membros da comunidade.
+Nesse site, analisaremos as seguintes funcionalidades: 
+**Adição e Remoção de Livros da Estante**, **Visualização da Estante**, **Cadastro de Livro**, **Disponibilização de Livro** e **Solicitação de Livro**.
+
+---
+
+### Documentação de Features e Funcionalidades  
+
+#### Adição e Remoção de Livros da Estante
+Para adicionar um livro à sua estante, o usuário deve primeiro encontrar o livro desejado através da barra de busca. 
+Se o livro estiver cadastrado na plataforma, basta clicar no botão "Pôr na Estante" e escolher uma das quatro tags (Quero &nbsp; ler **[sic]**, Já Li, Lendo, Abandonado).
+Para removê-lo, basta clicar novamente na tag.
+
+![Livra_Livro - por_estante](images/livra_livro_por_estante.png)
+
+---
+#### Visualização da Estante
+Para visualizar sua estante, o usuário deve abrir o menu "Livros" e clicar em "Estante".
+Na estante, não há separação por tags, todos os livros adicionados são exibidos juntos. Para verificar a tag
+de um livro específico, o usuário precisa abrir a página desse livro clicando em sua capa ou título. Embora exista a opção
+de filtrar específicamente pelas tags "Já Li" e "Quero Ler" (por que não as outras duas?), só é possível
+escolher um único filtro ou ordenação por vez. Para estantes com muitos livros, isso pode dificultar a navegação.
+
+![Livra_Livro - estante](images/livra_livro_estante.png)
+
+---
+#### Cadastro de Livro
+Caso um livro ainda não esteja cadastrado na plataforma, o usuário pode adicioná-lo manualmente selecionando a opção "Adicionar Livro" no menu "Livros".
+Para realizar o cadastro, o usuário precisa preencher apenas o IBSN do livro, e o sistema busca automaticamente as informações do livro (título, autor, capa, editora, etc.) em uma base de dados externa.
+Opcionalmente, o usuário pode inserir informações adicionais, como categoria, sub-categoria e sinopse.
+Uma vez que o cadastro é realizado, o livro é automaticamente adicionado ao banco de dados do LivraLivro.
+
+![Livra_Livro - cadastro_livro](images/livra_livro_cadastro_livro.png)
+
+---
+#### Disponibilização de Livro
+Para disponibilizar um livro para doação, o usuário deve abrir a página do livro e clicar
+no botão "Tenho para troca". Após marcar um checkbox confirmando que possui
+o livro e o disponibilizará exclusivamente pelo LivraLivro, o usuário deve informar o estado de conservação do livro
+e eventuais discrepâncias em relação às informações previamente cadastradas e, finalmente, clicar em "Adicionar".
+
+![Livra_Livro - disponibilizar_livro](images/livra_livro_disponibilizacao.png)
+
+Uma vez que o livro foi disponibilizado, o usuário deve receber uma notificação quando outro usuário o solicitar.
+Também é possível visualizar todos os livros disponibilizados na página "Disponíveis", acessível pelo meno "Livros". Nessa página,
+é possível cancelar a disponibilização de um livro clicando no ícone de lixeira ao lado do título do livro. Apertar esse botão cancela
+imediatamente a disponibilização, sem qualquer confirmação adicional.
+
+![Livra_Livro - cancelar_disponibilizacao](images/livra_livro_cancelar_disponibilizacao.png)    
+
+---
+#### Solicitação de Livro
+Para solicitar um livro, o usuário deve acessar a página do livro desejado e, caso ele esteja disponível,
+clicar no botão "Solicitar" (na busca, é possível filtrar por disponibilidade).
+Em seguida, o usuário pode escolher de qual usuário deseja solicitar o livro (caso haja mais de um).
+São exibidas informações sobre o dono do livro, como nome, cidade, estado e último acesso à plataforma.
+Também é possível abrir o perfil completo do dono, onde são exibidas informações como avaliações e livros disponíveis.
+Para concluir a solicitação, o usuário deve estabelecer uma data limite para que o dono aceite a solicitação, e clicar em "Solicitar".
+![Livra_Livro - solicitar_livro](images/livra_livro_solicitacao.png)
+Caso o usuário não tenha nenhum ponto (como foi o meu caso), é exibida uma mensagem de erro, e a solitação é impedida.
+Embora bem intencionado, o sistema de pontos é fundamentalmente falho, e acaba sendo um obstáculo praticamente intransponível para o uso da plataforma.
+Isso porque, para ganhar pontos, o usuário precisa:
+- cadastrar um livro como solicitável;
+- esperar que outro usário (que tenha pontos disponíveis) solicite o livro;
+- enviar o livro via correios;
+- esperar o outro usuário confirmar o recebimento do livro.
+
+Na maioria das vezes, isso significa que usuários novos nunca conseguem doar seus livros,
+pois os demais usuários também não têm pontos para solicitá-los. Isso levanta a pergunta:
+como novos pontos entram em circulação? Segundo as FAQs do site,
+a única forma de obtê-los é concluindo uma doação e, ainda por cima, os pontos tem validade de 6 meses.
+Se cada ponto ganho por um usuário é um ponto gasto por outro, e os pontos expiram, o número de pontos
+em circulação tende a diminuir com o tempo, o que torna o sistema insustentável.
+![Livra_Livro - solicitar_livro_sem_pontos](images/livra_livro_sem_pontos.png)
+
+---
+
+### Pontos positivos e negativos
+#### Pontos Positivos:
+- Processo de adição de livros à estante é simples e rápido.
+- A seleção de tags disponíveis parece ser razoavelmente abrangente.
+- Cadastro de livros é facilitado pela busca automática de informações via IBSN.
+- Exibir a localização e data do último acesso do dono do livro ajuda
+a evitar solicitações para usuários inativos ou muito distantes.
+- Há uma tentativa de garantir trocas justas através do sistema de pontos.
+
+#### Pontos Negativos:
+- Sistema de pontos com falhas graves.
+- Falta de separação clara por tags prejudica a organização da estante.
+- Remoção de livros da estante não é intuitiva (por que isso não é feito na própria estante?).
+- Opções de filtragem e ordenação limitadas.
+
+---
+### Requisitos
+
+A partir da análise feita, alguns requisitos que podem ser extraídos são:
+
+- Implementar uma sistema de troca/doação mais flexível do que o sistema de pontos.
+- Indicar a tag de cada livro da estante.
+- Oferecer opções mais avançadas para organização da estante, como filtros 
+e ordenações mutualmente compatíveis, e remoção de livros diretamente da estante.
+- Permitir o cadastro automático de livros por ISBN.
+- Exibir informações relevantes do outro usuário, como localização, avaliação e último acesso,
+durante o processo de doação/troca.
