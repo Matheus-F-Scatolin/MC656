@@ -1,3 +1,69 @@
-# MC656
-This is the repository for the course work of the MC656 discipline.
+# MC656: Marketplace de Livros
+
+## Arquitetura do Sistema
+
+### Estilos Arquiteturais Adotados
+
+O projeto **Marketplace de Livros** adota uma combinação de estilos arquiteturais que se complementam para criar uma aplicação web robusta:
+
+#### 1. **Arquitetura em Camadas (Layering)**
+O sistema segue o padrão clássico de separação em camadas do Django framework:
+- **Camada de Apresentação (Presentation Layer)**: Templates HTML, views e URLs que gerenciam a interface do usuário
+- **Camada de Lógica de Negócio (Business Logic Layer)**: Views e models que implementam as regras de negócio da aplicação
+- **Camada de Acesso a Dados (Data Access Layer)**: Models do Django ORM que abstraem o acesso ao banco de dados
+- **Camada de Dados (Data Layer)**: Banco de dados SQLite que persiste as informações
+
+#### 2. **Model-View-Template (MVT)**
+Como uma variação do padrão MVC, o Django implementa o MVT:
+- **Model**: Define a estrutura dos dados (Book, User) e regras de negócio
+- **View**: Processa requisições, interage com models e retorna responses
+- **Template**: Responsável pela apresentação e renderização do HTML
+
+---
+Além disso, o projeto é organizado segundo o princípio de **Separação de Responsabilidades (Separation of Concerns)**, de forma que cada componente tem uma responsabilidade específica:
+- Models para definição de dados e regras de negócio
+- Views para lógica de controle e processamento de requisições  
+- Templates para apresentação
+- URLs para roteamento de requisições
+
+Esta combinação de estilos arquiteturais proporciona:
+- **Escalabilidade**: Possibilidade de expansão modular
+- **Testabilidade**: Componentes isolados facilitam testes unitários
+- **Reusabilidade**: Módulos podem ser reutilizados em outros contextos
+
+### Diagramas C4 da Arquitetura
+
+A arquitetura do sistema é representada através de diagramas C4 em três níveis de abstração:
+
+#### Nível 1 - Diagrama de Contexto
+O diagrama de contexto mostra a visão geral do sistema e seus usuários principais:
+
+![Diagrama C4 - Contexto](images/C4/C4_Context.drawio.png)
+
+#### Nível 2 - Diagrama de Container
+O diagrama de container detalha os principais componentes tecnológicos do sistema:
+
+![Diagrama C4 - Container](images/C4/C4_Container.drawio.png)
+
+#### Nível 3 - Diagrama de Componente
+O diagrama de componente decompõe a Aplicação Web Django em seus módulos internos:
+
+![Diagrama C4 - Componente](images/C4/C4_Component.drawio.png)
+
+### Descrição dos Principais Componentes
+
+#### **Accounts Component**
+Módulo dedicado ao gerenciamento de usuários, incluindo landing page, cadastro, autenticação e controle de sessões. Implementa tanto interfaces web quanto APIs REST para operações de usuário.
+
+#### **Books Component**
+Responsável por todo o ciclo de vida dos livros no marketplace: cadastro, listagem, busca avançada (por título, autor e curso) e gerenciamento do catálogo. Inclui interface administrativa para gestão de conteúdo.
+
+#### **Authentication Middleware**
+Sistema de segurança que protege rotas sensíveis, gerencia sessões de usuário e implementa validações de permissão através de decorators como `@login_required` e proteção CSRF.
+
+#### **URL Router**
+Componente de roteamento que direciona requisições HTTP para os módulos apropriados, organizando tanto endpoints web quanto APIs REST de forma centralizada e hierárquica.
+
+#### **ORM Data Layer**
+Camada de abstração de dados que utiliza o Django ORM para interagir com o banco SQLite, gerenciando modelos User e Book, migrações de esquema e operações de consulta complexas.
 
