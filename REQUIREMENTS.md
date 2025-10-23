@@ -13,21 +13,21 @@ Nesse site, analisaremos as seguintes funcionalidades: **cadastro de novo usuár
 #### Cadastro de novo usuário  
 A tela de registro permite a criação rápida de conta com e-mail e senha, exigindo requisitos mínimos de segurança (como comprimento mínimo e validação de formato de e-mail). O fluxo é direto, sem etapas adicionais complexas, o que facilita o onboarding de novos usuários.  
 
-![Skoob - Cadastro](images/skoob-cadastro.png)
+![Skoob - Cadastro](images/benchmark/skoob-cadastro.png)
 
 ---
 
 #### Página de perfil do usuário  
 Na página de perfil, o usuário pode visualizar e organizar suas leituras em categorias como **lidos**, **lendo**, **quero ler**, **favoritos** e até estatísticas como **livros trocados** e **páginas lidas**. Esse recurso cria uma sensação de rede social, incentivando o engajamento pela gamificação (progresso, metas de leitura).  
 
-![Skoob - Perfil](images/skoob-perfil.png)
+![Skoob - Perfil](images/benchmark/skoob-perfil.png)
 
 ---
 
 #### Ferramenta de busca em tempo real  
 A barra de busca exibe resultados dinâmicos conforme o usuário digita, sem necessidade de pressionar *enter*. A pré-visualização mostra título, autor e capa do livro, ajudando a evitar confusões e acelerando o acesso à obra desejada.  
 
-![Skoob - Busca](images/skoob-busca.png)
+![Skoob - Busca](images/benchmark/skoob-busca.png)
 
 ---
 
@@ -73,7 +73,7 @@ O que observar / capturar: homepage com blocos “Compre novamente”, “Contin
 Uso observado: recomenda produtos com base em histórico e comportamento.
 UX notes: bom para incentivar a descoberta; pode poluir se houver muitas seções.
 
-![Amazon - Catálogo](images/amazon-catalogo.png)
+![Amazon - Catálogo](images/benchmark/amazon-catalogo.png)
 
 ---
 
@@ -84,7 +84,7 @@ O que observar / capturar: campo de busca aberto com sugestão/preview.
 Uso observado: acelera o encontro do livro pelo título/autor/termo.
 UX notes: útil para evitar erros de digitação; permite acesso direto ao PDP sem precisar carregar a página de resultados. 
 
-![Amazon - Barra de busca](images/amazon-barra_busca.png)
+![Amazon - Barra de busca](images/benchmark/amazon-barra_busca.png)
 
 ---
 
@@ -95,7 +95,7 @@ O que observar / capturar: lista de resultados com filtros à esquerda; ordenaç
 Uso observado: usuários refinam por condição (novo/usado), preço, tempo de entrega.
 UX notes: filtros poderosos — importante replicar filtros relevantes (curso, edição, condição para marketplace universitário).
   
-![Amazon - Resultado da busca](images/amazon-resultado_busca.png)
+![Amazon - Resultado da busca](images/benchmark/amazon-resultado_busca.png)
 
 ---
 
@@ -106,7 +106,7 @@ O que observar / capturar: PDP completa (imagem, sinopse, bloco de compra, “ou
 Uso observado: consolida informação sobre edições/formato e múltiplas ofertas.
 UX notes: muito completa — ótima inspiração, porém excessiva para um fluxo de troca simples (pode confundir).
 
-![Amazon - Página de detalhamento do produto](images/amazon-pdp.png)
+![Amazon - Página de detalhamento do produto](images/benchmark/amazon-pdp.png)
 
 ---
 
@@ -117,7 +117,7 @@ O que observar / capturar: seção “Frequentemente comprados juntos” e “Pr
 Uso observado: promove vendas cruzadas e ajuda na descoberta de material complementar.
 UX notes: útil para sugerir livros de mesma disciplina ou materiais de referência.
   
-![Amazon - Recomendações relacionadas](images/amazon-recomendacao_relacionada.png)
+![Amazon - Recomendações relacionadas](images/benchmark/amazon-recomendacao_relacionada.png)
 
 ---
 
@@ -128,7 +128,7 @@ O que observar / capturar: bloco “Detalhes do produto” com ISBNs e especific
 Uso observado: importante para distinguir edições — crítico em livros acadêmicos.
 UX notes: no marketplace universitário, mostrar edição/ISBN/ano deve ser prioridade (evita confusões entre edições).
   
-![Amazon - Detalhes técnicos do produto](images/amazon-detalhes_produto.png)
+![Amazon - Detalhes técnicos do produto](images/benchmark/amazon-detalhes_produto.png)
 
 ---
 
@@ -139,7 +139,7 @@ O que observar / capturar: gráfico de distribuição por estrelas, avaliações
 Uso observado: auxilia a confiança do comprador; imagens de usuários ajudam a avaliar a condição do item (no caso de usados).
 UX notes: extremamente útil para reputação; para trocas entre alunos, incorporar avaliação do usuário e fotos da condição do livro é essencial.
   
-![Amazon - Avaliação do produto](images/amazon-avaliacao_produto.png)
+![Amazon - Avaliação do produto](images/benchmark/amazon-avaliacao_produto.png)
 
 ---
 
@@ -150,7 +150,7 @@ O que observar / capturar: tela de login/registro.
 Uso observado: gating de funcionalidades (mensageria/checkout) através de conta.
 UX notes: para a plataforma universitária, usar verificação institucional (email da universidade) melhora confiança/controle da comunidade.
   
-![Amazon - Login / criação de conta](images/amazon-login.png)
+![Amazon - Login / criação de conta](images/benchmark/amazon-login.png)
 
 ---
 
@@ -200,11 +200,11 @@ Nesse site, analisaremos as seguintes funcionalidades: **sistema de busca**, **h
 
 O acervus UNICAMP possui um robusto sistema de busca de obras, com vários campos a serem especificados, o que facilita encontrar uma obra específica. É possível especificar o título, autoria, edição, editora, entre outros.
 
-![Acervus - Busca](images/acervus-filtros-busca.png)
+![Acervus - Busca](images/benchmark/acervus-filtros-busca.png)
 
 Além disso, é possível filtrar as obras por localização, ou seja, por biblioteca, o que possibilita o usuário escolher a biblioteca de preferência.
 
-![Acervus - Filtor Biblioteca](images/acervus-filtro-biblio.png)
+![Acervus - Filtor Biblioteca](images/benchmark/acervus-filtro-biblio.png)
 
 ---
 
@@ -212,7 +212,7 @@ Além disso, é possível filtrar as obras por localização, ou seja, por bibli
 
 A plataforma conta com uma página, dentro do perfil, que mostra todo o histórico de empréstimo de livros, facilitando o controle de empréstimo pelo usuário e a renovação de empréstimos recorrentes.
 
-![Acervus - Empréstimos](images/acervus-emprestimos.png)
+![Acervus - Empréstimos](images/benchmark/acervus-emprestimos.png)
 
 ---
 
@@ -220,7 +220,7 @@ A plataforma conta com uma página, dentro do perfil, que mostra todo o históri
 
 Além de livros acadêmicos e artísticos, também é possível acessar teses e papers a partir da plataforma. Isso permite o sistema abrangir uma maior diversidade de obras, e facilita o acesso de produções científicas aos usuários.
 
-![Acervus - Produção científica](images/acervus-prod-cientifica.png)
+![Acervus - Produção científica](images/benchmark/acervus-prod-cientifica.png)
 
 ---
 
@@ -228,7 +228,7 @@ Além de livros acadêmicos e artísticos, também é possível acessar teses e 
 
 Um ponto importante sobre o sistema é que ele dispõe de várias opções de acessibilidade, incluindo um modo de alto contraste da página e um modo fácil de mudar o idioma da página.
 
-![Acervus - Acessibilidade](images/acervus-acessibilidade.png)
+![Acervus - Acessibilidade](images/benchmark/acervus-acessibilidade.png)
 
 ---
 
@@ -236,7 +236,7 @@ Um ponto importante sobre o sistema é que ele dispõe de várias opções de ac
 
 Ao realizar um empréstimo, o usuário recebe feedback em seu e-mail, cadastrado na página de login. Os principais e-mails contém comprovante de reserva, no momento da reserva, recibo de empréstimo, recebido no momento em que a obra foi emprestada, e aviso de devolução, recebido nos dias próximos à data de devolução da obra emprestada. Esse sistema automático de feedback ajuda o usuário a acompanhar o processo de empréstimo e devolver a obra dentro do prazo.
 
-![Acervus - Feedback](images/acervus-feedback.png)
+![Acervus - Feedback](images/benchmark/acervus-feedback.png)
 
 ---
 
@@ -280,7 +280,7 @@ Para adicionar um livro à sua estante, o usuário deve primeiro encontrar o liv
 Se o livro estiver cadastrado na plataforma, basta clicar no botão "Pôr na Estante" e escolher uma das quatro tags (Quero &nbsp; ler **[sic]**, Já Li, Lendo, Abandonado).
 Para removê-lo, basta clicar novamente na tag.
 
-![Livra_Livro - por_estante](images/livra_livro_por_estante.png)
+![Livra_Livro - por_estante](images/benchmark/livra_livro_por_estante.png)
 
 ---
 #### Visualização da Estante
@@ -290,7 +290,7 @@ de um livro específico, o usuário precisa abrir a página desse livro clicando
 de filtrar específicamente pelas tags "Já Li" e "Quero Ler" (por que não as outras duas?), só é possível
 escolher um único filtro ou ordenação por vez. Para estantes com muitos livros, isso pode dificultar a navegação.
 
-![Livra_Livro - estante](images/livra_livro_estante.png)
+![Livra_Livro - estante](images/benchmark/livra_livro_estante.png)
 
 ---
 #### Cadastro de Livro
@@ -299,7 +299,7 @@ Para realizar o cadastro, o usuário precisa preencher apenas o IBSN do livro, e
 Opcionalmente, o usuário pode inserir informações adicionais, como categoria, sub-categoria e sinopse.
 Uma vez que o cadastro é realizado, o livro é automaticamente adicionado ao banco de dados do LivraLivro.
 
-![Livra_Livro - cadastro_livro](images/livra_livro_cadastro_livro.png)
+![Livra_Livro - cadastro_livro](images/benchmark/livra_livro_cadastro_livro.png)
 
 ---
 #### Disponibilização de Livro
@@ -308,14 +308,14 @@ no botão "Tenho para troca". Após marcar um checkbox confirmando que possui
 o livro e o disponibilizará exclusivamente pelo LivraLivro, o usuário deve informar o estado de conservação do livro
 e eventuais discrepâncias em relação às informações previamente cadastradas e, finalmente, clicar em "Adicionar".
 
-![Livra_Livro - disponibilizar_livro](images/livra_livro_disponibilizacao.png)
+![Livra_Livro - disponibilizar_livro](images/benchmark/livra_livro_disponibilizacao.png)
 
 Uma vez que o livro foi disponibilizado, o usuário deve receber uma notificação quando outro usuário o solicitar.
 Também é possível visualizar todos os livros disponibilizados na página "Disponíveis", acessível pelo meno "Livros". Nessa página,
 é possível cancelar a disponibilização de um livro clicando no ícone de lixeira ao lado do título do livro. Apertar esse botão cancela
 imediatamente a disponibilização, sem qualquer confirmação adicional.
 
-![Livra_Livro - cancelar_disponibilizacao](images/livra_livro_cancelar_disponibilizacao.png)    
+![Livra_Livro - cancelar_disponibilizacao](images/benchmark/livra_livro_cancelar_disponibilizacao.png)    
 
 ---
 #### Solicitação de Livro
@@ -326,7 +326,7 @@ São exibidas informações sobre o dono do livro, como nome, cidade, estado e �
 Também é possível abrir o perfil completo do dono, onde são exibidas informações como avaliações e livros disponíveis.
 Para concluir a solicitação, o usuário deve estabelecer uma data limite para que o dono aceite a solicitação, e clicar em "Solicitar".
 
-![Livra_Livro - solicitar_livro](images/livra_livro_solicitacao.png)
+![Livra_Livro - solicitar_livro](images/benchmark/livra_livro_solicitacao.png)
 
 Caso o usuário não tenha nenhum ponto (como foi o meu caso), é exibida uma mensagem de erro, e a solitação é impedida.
 Embora bem intencionado, o sistema de pontos é fundamentalmente falho, e acaba sendo um obstáculo praticamente intransponível para o uso da plataforma.
@@ -343,7 +343,7 @@ a única forma de obtê-los é concluindo uma doação e, ainda por cima, os pon
 Se cada ponto ganho por um usuário é um ponto gasto por outro, e os pontos expiram, o número de pontos
 em circulação tende a diminuir com o tempo, o que torna o sistema insustentável.
 
-![Livra_Livro - solicitar_livro_sem_pontos](images/livra_livro_sem_pontos.png)
+![Livra_Livro - solicitar_livro_sem_pontos](images/benchmark/livra_livro_sem_pontos.png)
 
 ---
 
