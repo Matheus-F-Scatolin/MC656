@@ -1,0 +1,111 @@
+{% extends 'books/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">My Bookshelf</h2>
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; margin-top: 1rem;">
+        {% if bookshelf.books.all %}
+            {% load static %}
+            {% for item in bookshelf.bookshelfitem_set.all %}
+            <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-left: 4px solid #007bff; position: relative;">
+
+                <!-- Tag display / dropdown -->
+                <div style="position: absolute; top: 10px; right: 10px;">
+                    <div class="tag-container" data-item-id="{{ item.id }}" style="position: relative;">
+                        <button type="button" class="tag-button" style="background-color: #f0f0f0; border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer;">
+                            {% if item.tag == 1 %}Wanted
+                            {% elif item.tag == 2 %}Reading
+                            {% elif item.tag == 3 %}Read
+                            {% else %}Untagged{% endif %}
+                        </button>
+                        <div class="tag-dropdown" style="display: none; position: absolute; top: 100%; right: 0; background: white; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 10;">
+                            <div class="tag-option" data-tag="0">Untagged</div>
+                            <div class="tag-option" data-tag="1">Wanted</div>
+                            <div class="tag-option" data-tag="2">Reading</div>
+                            <div class="tag-option" data-tag="3">Read</div>
+                        </div>
+                    </div>
+                </div>
+
+                <p style="margin: 0.5rem 0;"><strong>Author:</strong> {{ item.book.author }}</p>
+                <p style="margin: 0.5rem 0;"><strong>Course:</strong> {{ item.book.course }}</p>
+                <p style="margin: 0.5rem 0; color: #6c757d; font-size: 0.9rem;">
+                    <strong>Registered:</strong> {{ item.book.created_at|date:"M d, Y" }}
+                </p>
+
+                {% if item.book.id %}
+                <form method="POST" action="{% url 'bookshelves:remove_from_bookshelf' item.book.id %}">
+                    {% csrf_token %}
+                    <button type="submit">Remove</button>
+                </form>
+                {% endif %}
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    It's awfully empty in here... Get to browsing and find some books!
+                </div>
+                <a href="{% url 'book_list' %}" class="btn btn-primary">Explore our catalogue</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.tag-button').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            const dropdown = e.target.closest('.tag-container').querySelector('.tag-dropdown');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        });
+    });
+
+    document.querySelectorAll('.tag-option').forEach(option => {
+        option.addEventListener('click', async function(e) {
+            const newTag = e.target.dataset.tag;
+            const container = e.target.closest('.tag-container');
+            const itemId = container.dataset.itemId;
+            const button = container.querySelector('.tag-button');
+            const dropdown = container.querySelector('.tag-dropdown');
+
+            // Update via AJAX
+            const response = await fetch("{% url 'bookshelves:update_tag' %}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ id: itemId, tag: newTag })
+            });
+
+            if (response.ok) {
+                const tagNames = {0: 'Untagged', 1: 'Wanted', 2: 'Reading', 3: 'Read'};
+                button.textContent = tagNames[newTag];
+            } else {
+                alert('Failed to update tag');
+            }
+            dropdown.style.display = 'none';
+        });
+    });
+
+    // Close dropdowns when clicking elsewhere
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.tag-container')) {
+            document.querySelectorAll('.tag-dropdown').forEach(dd => dd.style.display = 'none');
+        }
+    });
+});
+</script>
+{% endblock %}

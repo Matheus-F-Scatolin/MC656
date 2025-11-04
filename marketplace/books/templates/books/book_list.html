@@ -15,6 +15,19 @@
                 <p style="margin: 0.5rem 0; color: #6c757d; font-size: 0.9rem;">
                     <strong>Registered:</strong> {{ book.created_at|date:"M d, Y" }}
                 </p>
+
+                <form method="POST" action="{% url 'add_to_shelf' book.id %}" style="margin-top: 1rem;">
+                    {% csrf_token %}
+                    <div style="display: flex; gap: 0.5rem;">
+                        <select name="tag" class="form-control" style="flex: 1;">
+                            <option value="0">Untagged</option>
+                            <option value="1">Wanted</option>
+                            <option value="2">Reading</option>
+                            <option value="3">Read</option>
+                        </select>
+                        <button type="submit" class="btn btn-primary btn-sm">Add to Shelf</button>
+                    </div>
+                </form>
             </div>
         {% endfor %}
     </div>
