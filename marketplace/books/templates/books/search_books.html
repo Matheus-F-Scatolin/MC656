@@ -58,15 +58,26 @@
 <!-- Results Grid -->
 <div id="books-container" class="books-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;">
     {% for book in books %}
-        <div class="book-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-left: 4px solid #007bff;">
-            <h3 style="color: #007bff; margin: 0 0 0.5rem 0; font-size: 1.2rem;">{{ book.title }}</h3>
-            <p style="margin: 0.5rem 0; color: #666;"><strong>Author:</strong> {{ book.author }}</p>
-            <p style="margin: 0.5rem 0; color: #666;"><strong>Course:</strong> {{ book.course }}</p>
-            <p style="margin: 0.5rem 0; color: #888; font-size: 0.9rem;">Added on {{ book.created_at|date:"M d, Y" }}</p>
-        </div>
-    {% empty %}
-        <div style="text-align: center; padding: 3rem; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-            <h3 style="color: #666;">No books found.</h3>
+        <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-left: 4px solid #007bff;">
+            <h3 style="margin-top: 0; color: #007bff;">{{ book.title }}</h3>
+            <p style="margin: 0.5rem 0;"><strong>Author:</strong> {{ book.author }}</p>
+            <p style="margin: 0.5rem 0;"><strong>Course:</strong> {{ book.course }}</p>
+            <p style="margin: 0.5rem 0; color: #6c757d; font-size: 0.9rem;">
+                <strong>Registered:</strong> {{ book.created_at|date:"M d, Y" }}
+            </p>
+
+            <form method="POST" action="{% url 'add_to_shelf' book.id %}" style="margin-top: 1rem;">
+                {% csrf_token %}
+                <div style="display: flex; gap: 0.5rem;">
+                    <select name="tag" class="form-control" style="flex: 1;">
+                        <option value="0">Untagged</option>
+                        <option value="1">Wanted</option>
+                        <option value="2">Reading</option>
+                        <option value="3">Read</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary btn-sm">Add to Shelf</button>
+                </div>
+            </form>
         </div>
     {% endfor %}
 </div>

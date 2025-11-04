@@ -4,9 +4,12 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods, require_GET
+from django.shortcuts import get_object_or_404
 
 from .models import Book
 from .search_strategies import BookSearchService
+
+from bookshelves.models import Bookshelf, BookshelfItem
 
 
 # Create your views here.
@@ -79,6 +82,35 @@ def register_book(request):
             return render(request, 'books/register_book.html', {'error': error_message})
 
     return render(request, 'books/register_book.html')
+
+
+@login_required
+def add_to_shelf(request, book_id):
+    """View to add a book to user's bookshelf with a specific tag."""
+    if request.method == 'POST':
+        book = get_object_or_404(Book, id=book_id)
+        tag = int(request.POST.get('tag', 0))
+
+        # Get or create user's bookshelf
+        bookshelf, created = Bookshelf.objects.get_or_create(
+            user=request.user
+        )
+
+        # Create or update the BookshelfItem
+        bookshelf_item, created = BookshelfItem.objects.get_or_create(
+            book=book,
+            bookshelf=bookshelf,
+            defaults={'tag': tag}
+        )
+
+        # Update tag if entry already exists
+        if not created:
+            bookshelf_item.tag = tag
+            bookshelf_item.save()
+
+        return redirect('book_list')
+
+    return redirect('book_list')
 
 
 @csrf_exempt
