@@ -4,6 +4,13 @@ from django.contrib.auth.models import User
 from books.models import Book
 
 
+class BookshelfTag(models.TextChoices):
+    UNTAGGED = '0', 'Untagged'
+    WANTED = '1', 'Wanted'
+    READING = '2', 'Reading'
+    READ = '3', 'Read'
+
+
 class Bookshelf(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     books = models.ManyToManyField(Book, through='BookshelfItem')
@@ -16,7 +23,11 @@ class BookshelfItem(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     bookshelf = models.ForeignKey(Bookshelf, on_delete=models.CASCADE)
     added_at = models.DateTimeField(auto_now_add=True)
-    tag = models.IntegerField(default=0)
+    tag = models.CharField(
+        max_length=1,
+        choices=BookshelfTag.choices,
+        default=BookshelfTag.UNTAGGED
+    )
 
     class Meta:
         unique_together = ['book', 'bookshelf']

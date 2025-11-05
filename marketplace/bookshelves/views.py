@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 import json
 
-from .models import Bookshelf, BookshelfItem
+from .models import Bookshelf, BookshelfItem, BookshelfTag
 from books.models import Book
 
 
@@ -24,7 +24,17 @@ def update_tag(request):
         new_tag = data.get('tag')
         try:
             item = BookshelfItem.objects.get(id=item_id, bookshelf__user=request.user)
-            item.tag = int(new_tag)
+            
+            # Handle both integer and string values for backward compatibility
+            if isinstance(new_tag, int):
+                # Convert integer to string for the new CharField
+                new_tag = str(new_tag)
+            
+            # Validate that the tag value is valid
+            if new_tag not in [choice[0] for choice in BookshelfTag.choices]:
+                return JsonResponse({'error': 'Invalid tag value'}, status=400)
+            
+            item.tag = new_tag
             item.save()
             return JsonResponse({'success': True})
         except BookshelfItem.DoesNotExist:
