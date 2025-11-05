@@ -44,6 +44,14 @@ def update_tag(request):
 @login_required
 def bookshelf_view(request):
     bookshelf, created = Bookshelf.objects.get_or_create(user=request.user)
-    return render(request, 'bookshelves/bookshelf.html', {'bookshelf': bookshelf})
+    
+    # Provide tag choices to template to eliminate shotgun surgery
+    context = {
+        'bookshelf': bookshelf,
+        'tag_choices': BookshelfTag.choices,
+        'tag_choices_json': json.dumps(dict(BookshelfTag.choices))
+    }
+    
+    return render(request, 'bookshelves/bookshelf.html', context)
 
 

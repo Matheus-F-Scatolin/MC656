@@ -24,16 +24,12 @@
                 <div style="position: absolute; top: 10px; right: 10px;">
                     <div class="tag-container" data-item-id="{{ item.id }}" style="position: relative;">
                         <button type="button" class="tag-button" style="background-color: #f0f0f0; border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer;">
-                            {% if item.tag == '1' %}Wanted
-                            {% elif item.tag == '2' %}Reading
-                            {% elif item.tag == '3' %}Read
-                            {% else %}Untagged{% endif %}
+                            {{ item.get_tag_display }}
                         </button>
                         <div class="tag-dropdown" style="display: none; position: absolute; top: 100%; right: 0; background: white; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 10;">
-                            <div class="tag-option" data-tag="0">Untagged</div>
-                            <div class="tag-option" data-tag="1">Wanted</div>
-                            <div class="tag-option" data-tag="2">Reading</div>
-                            <div class="tag-option" data-tag="3">Read</div>
+                            {% for tag_value, tag_label in tag_choices %}
+                            <div class="tag-option" data-tag="{{ tag_value }}">{{ tag_label }}</div>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
@@ -65,6 +61,9 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Convert tag choices to JavaScript object (eliminates hardcoded mapping)
+    const tagChoices = {{ tag_choices_json|safe }};
+    
     document.querySelectorAll('.tag-button').forEach(btn => {
         btn.addEventListener('click', function(e) {
             const dropdown = e.target.closest('.tag-container').querySelector('.tag-dropdown');
@@ -91,8 +90,8 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             if (response.ok) {
-                const tagNames = {0: 'Untagged', 1: 'Wanted', 2: 'Reading', 3: 'Read'};
-                button.textContent = tagNames[newTag];
+                // Use the centralized tagChoices object instead of hardcoded mapping
+                button.textContent = tagChoices[newTag];
             } else {
                 alert('Failed to update tag');
             }
