@@ -2,7 +2,7 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth.models import User
 from books.models import Book
-from .models import Bookshelf, BookshelfItem
+from .models import Bookshelf, BookshelfItem, BookshelfTag
 import json
 
 
@@ -40,7 +40,7 @@ class BookshelfViewsTest(TestCase):
         """Should update the tag of an existing bookshelf item."""
         self.client.login(username='tester', password='pass123')
         url = reverse('bookshelves:update_tag')
-        payload = {'id': self.item.id, 'tag': 2}
+        payload = {'id': self.item.id, 'tag': BookshelfTag.READING}
         response = self.client.post(
             url,
             data=json.dumps(payload),
@@ -55,7 +55,7 @@ class BookshelfViewsTest(TestCase):
         """Should return 404 when item does not exist."""
         self.client.login(username='tester', password='pass123')
         url = reverse('bookshelves:update_tag')
-        payload = {'id': 999, 'tag': 3}
+        payload = {'id': 999, 'tag': BookshelfTag.READING}
         response = self.client.post(
             url,
             data=json.dumps(payload),
@@ -77,7 +77,7 @@ class BookshelfViewsTest(TestCase):
         url = reverse('bookshelves:update_tag')
         response = self.client.post(
             url,
-            data=json.dumps({'id': self.item.id, 'tag': 1}),
+            data=json.dumps({'id': self.item.id, 'tag': BookshelfTag.WANTED}),
             content_type='application/json'
         )
         self.assertEqual(response.status_code, 302)
