@@ -5,45 +5,16 @@ from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods, require_GET
 from django.shortcuts import get_object_or_404
-
 from .models import Book
 from .search_strategies import BookSearchService
-
 from bookshelves.models import Bookshelf, BookshelfItem
 
-
-# Create your views here.
 
 @login_required
 def book_list(request):
     """View to display all available books."""
     books = Book.objects.all()
     return render(request, 'books/book_list.html', {'books': books})
-
-
-@login_required
-def search_books_old(request):
-    """View to search for books based on query parameters."""
-    query = request.GET.get('q', '').strip()
-    books = []
-
-    if query:
-        # Search in title, author, and course fields
-        books = Book.objects.filter(
-            Q(title__icontains=query) |
-            Q(author__icontains=query) |
-            Q(course__icontains=query)
-        ).distinct()
-    else:
-        # If no query, show all books
-        books = Book.objects.all()
-
-    context = {
-        'books': books,
-        'query': query,
-        'is_search': True
-    }
-    return render(request, 'books/search_books.html', context)
 
 
 @login_required
@@ -89,26 +60,26 @@ def add_to_shelf(request, book_id):
     """View to add a book to user's bookshelf with a specific tag."""
     if request.method == 'POST':
         book = get_object_or_404(Book, id=book_id)
-        tag = int(request.POST.get('tag', 0))
+        tag = request.POST.get('tag', 0)
 
-        # Get or create user's bookshelf
-        bookshelf, created = Bookshelf.objects.get_or_create(
-            user=request.user
-        )
-
-        # Create or update the BookshelfItem
-        bookshelf_item, created = BookshelfItem.objects.get_or_create(
-            book=book,
-            bookshelf=bookshelf,
-            defaults={'tag': tag}
-        )
-
-        # Update tag if entry already exists
-        if not created:
-            bookshelf_item.tag = tag
-            bookshelf_item.save()
-
-        return redirect('book_list')
+        try:
+            # Get or create user's bookshelf
+            bookshelf, created = Bookshelf.get_or_create_for_user(request.user)
+            
+            # Add or update the book in the shelf
+            bookshelf_item, item_created = bookshelf.add_or_update_item(
+                book=book, 
+                tag=tag, 
+                actor=request.user
+            )
+            
+            return redirect('book_list')
+            
+        except ValueError as e:
+            # Handle invalid tag values or other validation errors
+            # In a production app, you might want to show an error message to the user
+            # For now, we'll just redirect back to the book list
+            return redirect('book_list')
 
     return redirect('book_list')
 
@@ -130,35 +101,6 @@ def book_list_api(request):
             'updated_at': book.updated_at.isoformat(),
         })
     return JsonResponse({'books': book_data})
-
-
-@csrf_exempt
-@require_GET
-@login_required
-def search_books_api_old(request):
-    """API endpoint using same strategy logic (AJAX)."""
-    mode = request.GET.get('mode', 'combined')
-    query = request.GET.get('q', '').strip()
-    title = request.GET.get('title', '').strip()
-    author = request.GET.get('author', '').strip()
-    course = request.GET.get('course', '').strip()
-
-    search_service = BookSearchService(strategy_name=mode)
-
-    if mode == 'advanced':
-        books = search_service.search(title=title, author=author, course=course)
-    else:
-        books = search_service.search(query=query)
-
-    data = [{
-        'id': b.id,
-        'title': b.title,
-        'author': b.author,
-        'course': b.course,
-        'created_at': b.created_at.isoformat(),
-    } for b in books]
-
-    return JsonResponse({'books': data, 'count': len(data)})
 
 
 @csrf_exempt
