@@ -67,3 +67,12 @@ Componente de roteamento que direciona requisições HTTP para os módulos aprop
 #### **ORM Data Layer**
 Camada de abstração de dados que utiliza o Django ORM para interagir com o banco SQLite, gerenciando modelos User e Book, migrações de esquema e operações de consulta complexas.
 
+### Books Component - Padrão de Projeto _Strategy_
+Usuários podem ter expectativas diferentes ao buscar livros: podem estar interessados em um único livro cujo título é conhecido, ou em qualquer livro relacionado a alguma disciplina, ou, ainda, apenas em livros relacionados a uma disciplina escritos por um determinado autor. Para atender a essas necessidades diversas, o componente Books adota diferentes estratégias de busca dependendo do contexto da pesquisa. O usuário pode escolher um tipo de busca por meio da interface da aplicação, e o componente Books identifica o contexto correspondente a partir do request HTTP. Por enquanto, foram criadas cinco estratégia, cada uma implementando sua própria lógica de busca:
+- *Title*: retorna livros cujo título corresponde à string informada pelo usuário;
+- *Author*: retorna livros cujo autor corresponde à string informada pelo usuário;
+- *Course*: retorna livros cujo curso ou disciplina corresponde à string informada pelo usuário;
+- *Combined*: retorna livros para os quais qualquer campo (título, autor ou curso) corresponde à string informada pelo usuário;
+- *Advanced*: retorna livros cujo título, autor e curso correspondem cada um a uma string diferente. Neste caso, é possível ignorar um ou mais campos informando uma string vazia (que corresponde a qualquer valor).
+
+Essa abordagem desacopla a implementação de cada estratégia do contexto, o que simplifica a criação de novas estratégias.
