@@ -2,8 +2,9 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth.models import User
 from books.models import Book
-from .models import Bookshelf, BookshelfItem
+from .models import Bookshelf, BookshelfItem, BookshelfTag
 import json
+
 
 class BookshelfViewsTest(TestCase):
     def setUp(self):
@@ -11,7 +12,7 @@ class BookshelfViewsTest(TestCase):
         self.user = User.objects.create_user(username='tester', password='pass123')
         self.book = Book.objects.create(title='Test Book', author='Author', course='Course')
         self.bookshelf = Bookshelf.objects.create(user=self.user)
-        self.item = BookshelfItem.objects.create(book=self.book, bookshelf=self.bookshelf, tag=0)
+        self.item = BookshelfItem.objects.create(book=self.book, bookshelf=self.bookshelf, tag=BookshelfTag.UNTAGGED)
 
     def test_bookshelf_view_requires_login(self):
         """Anonymous users should be redirected to login."""
@@ -39,7 +40,7 @@ class BookshelfViewsTest(TestCase):
         """Should update the tag of an existing bookshelf item."""
         self.client.login(username='tester', password='pass123')
         url = reverse('bookshelves:update_tag')
-        payload = {'id': self.item.id, 'tag': 2}
+        payload = {'id': self.item.id, 'tag': BookshelfTag.READING}
         response = self.client.post(
             url,
             data=json.dumps(payload),
@@ -47,14 +48,14 @@ class BookshelfViewsTest(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.item.refresh_from_db()
-        self.assertEqual(self.item.tag, 2)
+        self.assertEqual(self.item.tag, BookshelfTag.READING)
         self.assertJSONEqual(response.content, {'success': True})
 
     def test_update_tag_invalid_item(self):
         """Should return 404 when item does not exist."""
         self.client.login(username='tester', password='pass123')
         url = reverse('bookshelves:update_tag')
-        payload = {'id': 999, 'tag': 3}
+        payload = {'id': 999, 'tag': BookshelfTag.READ}
         response = self.client.post(
             url,
             data=json.dumps(payload),
@@ -76,11 +77,73 @@ class BookshelfViewsTest(TestCase):
         url = reverse('bookshelves:update_tag')
         response = self.client.post(
             url,
-            data=json.dumps({'id': self.item.id, 'tag': 1}),
+            data=json.dumps({'id': self.item.id, 'tag': BookshelfTag.WANTED}),
             content_type='application/json'
         )
         self.assertEqual(response.status_code, 302)
         self.assertIn('/login', response.url)
+
+    def test_update_tag_backward_compatibility_integer(self):
+        """Should handle integer tag values for backward compatibility."""
+        self.client.login(username='tester', password='pass123')
+        url = reverse('bookshelves:update_tag')
+        payload = {'id': self.item.id, 'tag': 2}  # Integer value
+        response = self.client.post(
+            url,
+            data=json.dumps(payload),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 200)
+        self.item.refresh_from_db()
+        self.assertEqual(self.item.tag, BookshelfTag.READING)  # Should be stored as string
+        self.assertJSONEqual(response.content, {'success': True})
+
+    def test_update_tag_invalid_value(self):
+        """Should return error for invalid tag values."""
+        self.client.login(username='tester', password='pass123')
+        url = reverse('bookshelves:update_tag')
+        payload = {'id': self.item.id, 'tag': '99'}  # Invalid tag value
+        response = self.client.post(
+            url,
+            data=json.dumps(payload),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('error', response.json())
+
+    def test_bookshelf_tag_choices(self):
+        """Test that BookshelfTag choices are correctly defined."""
+        expected_choices = [
+            ('0', 'Untagged'),
+            ('1', 'Wanted'),
+            ('2', 'Reading'),
+            ('3', 'Read'),
+        ]
+        self.assertEqual(BookshelfTag.choices, expected_choices)
+
+    def test_bookshelf_view_provides_tag_choices(self):
+        """Test that bookshelf view provides tag choices to template."""
+        self.client.login(username='tester', password='pass123')
+        response = self.client.get(reverse('bookshelves:bookshelf'))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('tag_choices', response.context)
+        self.assertIn('tag_choices_json', response.context)
+        self.assertEqual(response.context['tag_choices'], BookshelfTag.choices)
+
+    def test_item_get_tag_display(self):
+        """Test that BookshelfItem.get_tag_display() works correctly."""
+        # Test default untagged
+        self.assertEqual(self.item.get_tag_display(), 'Untagged')
+        
+        # Test other tags
+        self.item.tag = BookshelfTag.WANTED
+        self.assertEqual(self.item.get_tag_display(), 'Wanted')
+        
+        self.item.tag = BookshelfTag.READING
+        self.assertEqual(self.item.get_tag_display(), 'Reading')
+        
+        self.item.tag = BookshelfTag.READ
+        self.assertEqual(self.item.get_tag_display(), 'Read')
 
 
 class BookshelfModelTest(TestCase):
@@ -113,18 +176,18 @@ class BookshelfModelTest(TestCase):
         """Test adding a new book to the shelf."""
         item, created = self.bookshelf.add_or_update_item(
             book=self.book1, 
-            tag=1, 
+            tag=BookshelfTag.WANTED,  # Use BookshelfTag constant
             actor=self.user
         )
         
         self.assertTrue(created)
         self.assertEqual(item.book, self.book1)
         self.assertEqual(item.bookshelf, self.bookshelf)
-        self.assertEqual(item.tag, 1)
+        self.assertEqual(item.tag, BookshelfTag.WANTED)  # String value '1'
         
         # Verify the item exists in database
         db_item = BookshelfItem.objects.get(book=self.book1, bookshelf=self.bookshelf)
-        self.assertEqual(db_item.tag, 1)
+        self.assertEqual(db_item.tag, BookshelfTag.WANTED)
     
     def test_add_or_update_item_existing_book(self):
         """Test updating an existing book's tag in the shelf."""
@@ -132,42 +195,54 @@ class BookshelfModelTest(TestCase):
         BookshelfItem.objects.create(
             book=self.book1, 
             bookshelf=self.bookshelf, 
-            tag=0
+            tag=BookshelfTag.UNTAGGED  # Use BookshelfTag constant
         )
         
         # Update the tag
         item, created = self.bookshelf.add_or_update_item(
             book=self.book1, 
-            tag=2, 
+            tag=BookshelfTag.READING,  # Use BookshelfTag constant
             actor=self.user
         )
         
         self.assertFalse(created)
-        self.assertEqual(item.tag, 2)
+        self.assertEqual(item.tag, BookshelfTag.READING)  # String value '2'
         
         # Verify only one item exists and it has the new tag
         items = BookshelfItem.objects.filter(book=self.book1, bookshelf=self.bookshelf)
         self.assertEqual(items.count(), 1)
-        self.assertEqual(items.first().tag, 2)
+        self.assertEqual(items.first().tag, BookshelfTag.READING)
     
     def test_add_or_update_item_string_tag(self):
-        """Test that string tags are converted to integers."""
+        """Test that string tags are handled correctly."""
         item, created = self.bookshelf.add_or_update_item(
             book=self.book1, 
-            tag="3", 
+            tag="3",  # String value (should be valid)
             actor=self.user
         )
         
         self.assertTrue(created)
-        self.assertEqual(item.tag, 3)
-        self.assertIsInstance(item.tag, int)
+        self.assertEqual(item.tag, BookshelfTag.READ)  # String value '3'
+        self.assertIsInstance(item.tag, str)  # Should be string now, not int
+    
+    def test_add_or_update_item_backward_compatibility_integer(self):
+        """Test that integer tags are converted to strings for backward compatibility."""
+        item, created = self.bookshelf.add_or_update_item(
+            book=self.book1, 
+            tag=3,  # Integer value (backward compatibility)
+            actor=self.user
+        )
+        
+        self.assertTrue(created)
+        self.assertEqual(item.tag, BookshelfTag.READ)  # Should be converted to string '3'
+        self.assertIsInstance(item.tag, str)
     
     def test_add_or_update_item_none_book_raises_error(self):
         """Test that passing None as book raises ValueError."""
         with self.assertRaises(ValueError) as context:
             self.bookshelf.add_or_update_item(
                 book=None, 
-                tag=1, 
+                tag=BookshelfTag.WANTED, 
                 actor=self.user
             )
         
@@ -175,7 +250,7 @@ class BookshelfModelTest(TestCase):
     
     def test_add_or_update_item_invalid_tag_raises_error(self):
         """Test that invalid tag values raise ValueError."""
-        invalid_tags = ['invalid', None, [], {}]
+        invalid_tags = ['invalid', '99', None, [], {}]
         
         for invalid_tag in invalid_tags:
             with self.assertRaises(ValueError) as context:
@@ -185,39 +260,39 @@ class BookshelfModelTest(TestCase):
                     actor=self.user
                 )
             
-            self.assertIn("Tag must be a valid integer", str(context.exception))
+            self.assertIn("Tag must be a valid", str(context.exception))
     
     def test_add_or_update_item_without_actor(self):
         """Test that actor parameter is optional."""
         item, created = self.bookshelf.add_or_update_item(
             book=self.book1, 
-            tag=1
+            tag=BookshelfTag.WANTED
         )
         
         self.assertTrue(created)
         self.assertEqual(item.book, self.book1)
-        self.assertEqual(item.tag, 1)
+        self.assertEqual(item.tag, BookshelfTag.WANTED)
     
     def test_add_or_update_item_multiple_books(self):
         """Test adding multiple different books to the shelf."""
         # Add first book
         item1, created1 = self.bookshelf.add_or_update_item(
             book=self.book1, 
-            tag=1
+            tag=BookshelfTag.WANTED
         )
         
         # Add second book
         item2, created2 = self.bookshelf.add_or_update_item(
             book=self.book2, 
-            tag=2
+            tag=BookshelfTag.READING
         )
         
         self.assertTrue(created1)
         self.assertTrue(created2)
         self.assertEqual(item1.book, self.book1)
         self.assertEqual(item2.book, self.book2)
-        self.assertEqual(item1.tag, 1)
-        self.assertEqual(item2.tag, 2)
+        self.assertEqual(item1.tag, BookshelfTag.WANTED)
+        self.assertEqual(item2.tag, BookshelfTag.READING)
         
         # Verify both items exist
         items = BookshelfItem.objects.filter(bookshelf=self.bookshelf)
@@ -241,7 +316,7 @@ class AddToShelfIntegrationTest(TestCase):
         
         response = self.client.post(
             reverse('add_to_shelf', kwargs={'book_id': self.book.id}),
-            {'tag': '1'}
+            {'tag': BookshelfTag.WANTED}  # Use BookshelfTag constant
         )
         
         # Should redirect to book_list
@@ -250,7 +325,7 @@ class AddToShelfIntegrationTest(TestCase):
         # Verify bookshelf and item were created
         bookshelf = Bookshelf.objects.get(user=self.user)
         item = BookshelfItem.objects.get(book=self.book, bookshelf=bookshelf)
-        self.assertEqual(item.tag, 1)
+        self.assertEqual(item.tag, BookshelfTag.WANTED)
     
     def test_add_to_shelf_updates_existing_item(self):
         """Test that add_to_shelf updates tag of existing bookshelf item."""
@@ -261,12 +336,12 @@ class AddToShelfIntegrationTest(TestCase):
         existing_item = BookshelfItem.objects.create(
             book=self.book, 
             bookshelf=bookshelf, 
-            tag=0
+            tag=BookshelfTag.UNTAGGED  # Use BookshelfTag constant
         )
         
         response = self.client.post(
             reverse('add_to_shelf', kwargs={'book_id': self.book.id}),
-            {'tag': '3'}
+            {'tag': BookshelfTag.READ}  # Use BookshelfTag constant
         )
         
         # Should redirect to book_list
@@ -274,11 +349,28 @@ class AddToShelfIntegrationTest(TestCase):
         
         # Verify tag was updated
         existing_item.refresh_from_db()
-        self.assertEqual(existing_item.tag, 3)
+        self.assertEqual(existing_item.tag, BookshelfTag.READ)
         
         # Verify only one item exists
         items = BookshelfItem.objects.filter(book=self.book, bookshelf=bookshelf)
         self.assertEqual(items.count(), 1)
+    
+    def test_add_to_shelf_backward_compatibility_integer_tag(self):
+        """Test that integer tag values still work for backward compatibility."""
+        self.client.login(username='testuser', password='pass123')
+        
+        response = self.client.post(
+            reverse('add_to_shelf', kwargs={'book_id': self.book.id}),
+            {'tag': '2'}  # String representation of integer
+        )
+        
+        # Should redirect to book_list
+        self.assertRedirects(response, reverse('book_list'))
+        
+        # Verify bookshelf and item were created with correct tag
+        bookshelf = Bookshelf.objects.get(user=self.user)
+        item = BookshelfItem.objects.get(book=self.book, bookshelf=bookshelf)
+        self.assertEqual(item.tag, BookshelfTag.READING)  # '2' should map to READING
     
     def test_add_to_shelf_invalid_tag_handled_gracefully(self):
         """Test that invalid tag values are handled gracefully."""
@@ -303,7 +395,7 @@ class AddToShelfIntegrationTest(TestCase):
         
         response = self.client.post(
             reverse('add_to_shelf', kwargs={'book_id': 99999}),
-            {'tag': '1'}
+            {'tag': BookshelfTag.WANTED}
         )
         
         self.assertEqual(response.status_code, 404)
@@ -312,7 +404,7 @@ class AddToShelfIntegrationTest(TestCase):
         """Test that unauthenticated users are redirected to login."""
         response = self.client.post(
             reverse('add_to_shelf', kwargs={'book_id': self.book.id}),
-            {'tag': '1'}
+            {'tag': BookshelfTag.WANTED}
         )
         
         self.assertEqual(response.status_code, 302)
