@@ -32,9 +32,16 @@ class Book(models.Model):
     
     def save(self, *args, **kwargs):
         """Override save to normalize and validate."""
+        # Convert empty string to None
+        if self.isbn == '':
+            self.isbn = None
+        
         # Normalize ISBN BEFORE validation
         if self.isbn:
             self.isbn = normalize_isbn(self.isbn)
+            # If normalization results in empty string, set to None
+            if not self.isbn:
+                self.isbn = None
         
         # Now validate
         self.full_clean()
