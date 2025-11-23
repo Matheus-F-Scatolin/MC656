@@ -3,10 +3,14 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_http_methods, require_GET
+from django.views.decorators.http import require_http_methods, require_GET, require_POST
 from django.shortcuts import get_object_or_404
+from django.core.exceptions import ValidationError
+import json
+
 from .models import Book
 from .search_strategies import BookSearchService
+from .utils import validate_isbn
 from bookshelves.models import Bookshelf, BookshelfItem
 
 
@@ -40,17 +44,49 @@ def register_book(request):
         title = request.POST.get('title')
         author = request.POST.get('author')
         course = request.POST.get('course')
+        isbn = request.POST.get('isbn', '').strip()
 
-        if title and author and course:
+        if not (title and author and course):
+            error_message = "Title, author, and course are required."
+            return render(request, 'books/register_book.html', {'error': error_message})
+        
+        # Validate ISBN if provided
+        if isbn and not validate_isbn(isbn):
+            error_message = "Invalid ISBN format. Please provide a valid ISBN-10 or ISBN-13."
+            return render(request, 'books/register_book.html', {
+                'error': error_message,
+                'title': title,
+                'author': author,
+                'course': course,
+                'isbn': isbn
+            })
+        
+        try:
             book = Book.objects.create(
                 title=title,
                 author=author,
-                course=course
+                course=course,
+                isbn=isbn if isbn else None
             )
             return redirect('book_list')
-        else:
-            error_message = "All fields are required."
-            return render(request, 'books/register_book.html', {'error': error_message})
+        except ValidationError as e:
+            error_message = str(e)
+            return render(request, 'books/register_book.html', {
+                'error': error_message,
+                'title': title,
+                'author': author,
+                'course': course,
+                'isbn': isbn
+            })
+        except Exception as e:
+            error_message = f"Error creating book: {str(e)}"
+            return render(request, 'books/register_book.html', {
+                'error': error_message,
+                'title': title,
+                'author': author,
+                'course': course,
+                'isbn': isbn
+            })
 
     return render(request, 'books/register_book.html')
 
@@ -97,6 +133,7 @@ def book_list_api(request):
             'title': book.title,
             'author': book.author,
             'course': book.course,
+            'isbn': book.isbn,
             'created_at': book.created_at.isoformat(),
             'updated_at': book.updated_at.isoformat(),
         })
@@ -118,6 +155,7 @@ def search_books_api(request):
             "title": b.title,
             "author": b.author,
             "course": b.course,
+            "isbn": b.isbn,
             "created_at": b.created_at.isoformat(),
         }
         for b in books
@@ -128,3 +166,75 @@ def search_books_api(request):
         "count": len(book_data),
         "mode": mode,
     })
+
+
+@csrf_exempt
+@require_POST
+@login_required
+def register_book_api(request):
+    """API endpoint to register a new book (POST)."""
+    try:
+        data = json.loads(request.body)
+        
+        title = data.get('title', '').strip()
+        author = data.get('author', '').strip()
+        course = data.get('course', '').strip()
+        isbn = data.get('isbn', '').strip()
+        
+        # Validate required fields
+        if not (title and author and course):
+            return JsonResponse({
+                'error': 'Title, author, and course are required fields.'
+            }, status=400)
+        
+        # Validate ISBN if provided
+        if isbn and not validate_isbn(isbn):
+            return JsonResponse({
+                'error': 'Invalid ISBN format. Please provide a valid ISBN-10 or ISBN-13.'
+            }, status=400)
+        
+        # Create the book
+        try:
+            book = Book.objects.create(
+                title=title,
+                author=author,
+                course=course,
+                isbn=isbn if isbn else None
+            )
+            
+            return JsonResponse({
+                'success': True,
+                'book': {
+                    'id': book.id,
+                    'title': book.title,
+                    'author': book.author,
+                    'course': book.course,
+                    'isbn': book.isbn,
+                    'created_at': book.created_at.isoformat(),
+                    'updated_at': book.updated_at.isoformat(),
+                }
+            }, status=201)
+            
+        except ValidationError as e:
+            return JsonResponse({
+                'error': str(e)
+            }, status=400)
+        except Exception as e:
+            # Handle duplicate ISBN or other database errors
+            error_msg = str(e)
+            if 'UNIQUE constraint failed' in error_msg or 'duplicate' in error_msg.lower():
+                return JsonResponse({
+                    'error': 'A book with this ISBN already exists.'
+                }, status=400)
+            return JsonResponse({
+                'error': f'Error creating book: {error_msg}'
+            }, status=500)
+            
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'error': 'Invalid JSON format in request body.'
+        }, status=400)
+    except Exception as e:
+        return JsonResponse({
+            'error': f'Unexpected error: {str(e)}'
+        }, status=500)
