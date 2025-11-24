@@ -180,7 +180,7 @@ class BookViewTestCase(TestCase):
         })
 
         self.assertEqual(Book.objects.count(), initial_count)
-        self.assertContains(response, "All fields are required.")
+        self.assertContains(response, "Title, author, and course are required.")
 
         # Test with missing course
         response = self.client.post(reverse('register_book'), {
@@ -189,7 +189,7 @@ class BookViewTestCase(TestCase):
         })
 
         self.assertEqual(Book.objects.count(), initial_count)
-        self.assertContains(response, "All fields are required.")
+        self.assertContains(response, "Title, author, and course are required.")
 
     def test_book_list_api_authenticated(self):
         """Test the API endpoint that returns books as JSON (authenticated)."""
@@ -446,4 +446,5 @@ class BookSearchServiceTestCase(TestCase):
             request = self.factory.get("/books/search/?q=")
             results = strategy_cls().search(request)
             self.assertEqual(len(results), 0)
+
 
