@@ -171,7 +171,7 @@ class BookViewTestCase(TestCase):
         self.assertEqual(Book.objects.count(), initial_count)
 
         # Check that an error message is displayed
-        self.assertContains(response, "All fields are required.")
+        self.assertContains(response, "Title, author, and course are required.")
 
         # Test with missing author
         response = self.client.post(reverse('register_book'), {
@@ -446,3 +446,4 @@ class BookSearchServiceTestCase(TestCase):
             request = self.factory.get("/books/search/?q=")
             results = strategy_cls().search(request)
             self.assertEqual(len(results), 0)
+
