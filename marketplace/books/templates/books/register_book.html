@@ -28,11 +28,22 @@
                placeholder="Enter the author's name">
     </div>
     
-    <div style="margin-bottom: 1.5rem;">
+    <div style="margin-bottom: 1rem;">
         <label for="course" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Related Course:</label>
         <input type="text" id="course" name="course" required 
                style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;"
                placeholder="Enter the university course (e.g., Computer Science 101)">
+    </div>
+    
+    <div style="margin-bottom: 1.5rem;">
+        <label for="isbn" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">ISBN (optional):</label>
+        <input type="text" id="isbn" name="isbn" 
+               style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;"
+               placeholder="Enter ISBN-10 or ISBN-13 (e.g., 978-0-596-52068-7)"
+               value="{{ isbn|default:'' }}">
+        <small style="color: #666; display: block; margin-top: 0.25rem;">
+            Enter a valid ISBN-10 (10 digits) or ISBN-13 (13 digits). Hyphens and spaces are optional.
+        </small>
     </div>
     
     <div style="text-align: center;">

@@ -171,7 +171,7 @@ class BookViewTestCase(TestCase):
         self.assertEqual(Book.objects.count(), initial_count)
 
         # Check that an error message is displayed
-        self.assertContains(response, "All fields are required.")
+        self.assertContains(response, "Title, author, and course are required.")
 
         # Test with missing author
         response = self.client.post(reverse('register_book'), {
@@ -180,7 +180,7 @@ class BookViewTestCase(TestCase):
         })
 
         self.assertEqual(Book.objects.count(), initial_count)
-        self.assertContains(response, "All fields are required.")
+        self.assertContains(response, "Title, author, and course are required.")
 
         # Test with missing course
         response = self.client.post(reverse('register_book'), {
@@ -189,7 +189,7 @@ class BookViewTestCase(TestCase):
         })
 
         self.assertEqual(Book.objects.count(), initial_count)
-        self.assertContains(response, "All fields are required.")
+        self.assertContains(response, "Title, author, and course are required.")
 
     def test_book_list_api_authenticated(self):
         """Test the API endpoint that returns books as JSON (authenticated)."""
@@ -549,3 +549,16 @@ class BookSearchServiceTestCase(TestCase):
         request = self.factory.get("/books/search/?q=python")
         results = CombinedSearchStrategy().search(request)
         self.assertEqual(list(results), [self.book1])
+
+    def test_empty_query_returns_all_combined(self):
+        request = self.factory.get("/books/search/?q=")
+        results = CombinedSearchStrategy().search(request)
+        self.assertEqual(set(results), {self.book1, self.book2, self.book3})
+
+    def test_empty_query_returns_none_for_specific_strategies(self):
+        for strategy_cls in [TitleSearchStrategy, AuthorSearchStrategy, CourseSearchStrategy]:
+            request = self.factory.get("/books/search/?q=")
+            results = strategy_cls().search(request)
+            self.assertEqual(len(results), 0)
+
+
