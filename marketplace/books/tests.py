@@ -348,8 +348,42 @@ class BookSearchTestCase(TestCase):
         self.assertEqual(len(response.context['books']), 3)
 
 
+"""
++-------------------------------+------------------------+---------------------+---------------------+----------------------------+-------------------------+-------------------------+-----------------------------+--------------------------+--------------------------+
+| Rule ID                       | R1                     | R2                  | R3                  | R4                         | R5                      | R6                      | R7                          | R8                       | R9                       |
++-------------------------------+------------------------+---------------------+---------------------+----------------------------+-------------------------+-------------------------+-----------------------------+--------------------------+--------------------------+
+| Scenario                      | Empty Search (Simple)  | Success (Simple)    | Failure (Simple)    | Empty Search (Combined)    | Success (Combined)      | Failure (Combined)      | Empty Search (Advanced)     | Success (Advanced)       | Failure (Advanced)       |
++-------------------------------+------------------------+---------------------+---------------------+----------------------------+-------------------------+-------------------------+-----------------------------+--------------------------+--------------------------+
+| CONDITIONS (Inputs)           |                        |                     |                     |                            |                         |                         |                             |                          |                          |
+| 1. Strategy                   | Simple*                | Simple*             | Simple*             | Combined                   | Combined                | Combined                | Advanced                    | Advanced                 | Advanced                 |
+| 2. Input 'q' (general search) | Empty                  | Match               | No Match            | Empty                      | Match                   | No Match                | N/A                         | N/A                      | N/A                      |
+| 3. Title/Author/Course Inputs | N/A                    | N/A                 | N/A                 | N/A                        | N/A                     | N/A                     | All Empty                   | All Match**              | At Least 1 No Match      |
++-------------------------------+------------------------+---------------------+---------------------+----------------------------+-------------------------+-------------------------+-----------------------------+--------------------------+--------------------------+
+| ACTIONS (Expected Outputs)    |                        |                     |                     |                            |                         |                         |                             |                          |                          |
+| A. Return All Books           | X                      |                     |                     | X                          |                         |                         | X                           |                          |                          |
+| B. Return Filtered QuerySet   |                        | X                   |                     |                            | X                       |                         |                             | X                        |                          |
+| C. Return Empty List          |                        |                     | X                   |                            |                         | X                       |                             |                          | X                        |
++-------------------------------+------------------------+---------------------+---------------------+----------------------------+-------------------------+-------------------------+-----------------------------+--------------------------+--------------------------+
+
+*Simple = TitleSearch, AuthorSearch or CourseSearch (each tested individually).
+**All Match = Every field provided had a corresponding match (Logical AND).
+
+Legend:
+- N/A: Not Applicable / Does Not Matter.
+- Empty: "" or only whitespace.
+- Match: Search term exists in the database.
+- No Match: Search term does not exist in the database.
+"""
+
 class BookSearchServiceTestCase(TestCase):
-    """Unit tests for the BookSearchService and its strategies."""
+    """
+    Unit tests for the BookSearchService strategies based on Decision Table.
+    
+    Table Reference:
+    - R1-R3: Simple Strategies (Title, Author, Course)
+    - R4-R6: Combined Strategy
+    - R7-R9: Advanced Strategy
+    """
 
     def setUp(self):
         self.factory = RequestFactory()
@@ -370,46 +404,126 @@ class BookSearchServiceTestCase(TestCase):
         )
 
     # --- Strategy-specific tests ---
+    # ==========================================================================
+    # GROUP 1: Simple Strategies (Title, Author, Course) - Rules R1, R2, R3
+    # Total: 9 test cases
+    # ==========================================================================
 
-    def test_title_search_strategy(self):
+    # --- TitleSearchStrategy ---
+
+    def test_title_strategy_r1_empty(self):
+        """[R1] Title Strategy: Input vazio deve retornar todos os livros."""
+        request = self.factory.get("/books/search/?q=   ") # Testando .strip()
+        results = TitleSearchStrategy().search(request)
+        self.assertEqual(len(results), 3)
+
+    def test_title_strategy_r2_match(self):
+        """[R2] Title Strategy: Input com match deve filtrar corretamente."""
         request = self.factory.get("/books/search/?q=Python")
         results = TitleSearchStrategy().search(request)
         self.assertEqual(list(results), [self.book1])
 
-    def test_author_search_strategy(self):
+    def test_title_strategy_r3_no_match(self):
+        """[R3] Title Strategy: Input sem match deve retornar lista vazia."""
+        request = self.factory.get("/books/search/?q=Java")
+        results = TitleSearchStrategy().search(request)
+        self.assertEqual(len(results), 0)
+
+    # --- AuthorSearchStrategy ---
+
+    def test_author_strategy_r1_empty(self):
+        """[R1] Author Strategy: Input vazio deve retornar todos os livros."""
+        request = self.factory.get("/books/search/?q=")
+        results = AuthorSearchStrategy().search(request)
+        self.assertEqual(len(results), 3)
+
+    def test_author_strategy_r2_match(self):
+        """[R2] Author Strategy: Input com match deve filtrar corretamente."""
         request = self.factory.get("/books/search/?q=Jane")
         results = AuthorSearchStrategy().search(request)
         self.assertEqual(list(results), [self.book2])
 
-    def test_course_search_strategy(self):
-        request = self.factory.get("/books/search/?q=CS201")
-        results = CourseSearchStrategy().search(request)
-        self.assertEqual(list(results), [self.book2])
+    def test_author_strategy_r3_no_match(self):
+        """[R3] Author Strategy: Input sem match deve retornar lista vazia."""
+        request = self.factory.get("/books/search/?q=Machado")
+        results = AuthorSearchStrategy().search(request)
+        self.assertEqual(len(results), 0)
 
-    def test_combined_search_strategy(self):
-        request = self.factory.get("/books/search/?q=Machine")
+    # --- CourseSearchStrategy ---
+
+    def test_course_strategy_r1_empty(self):
+        """[R1] Course Strategy: Input vazio deve retornar todos os livros."""
+        request = self.factory.get("/books/search/?q=")
+        results = CourseSearchStrategy().search(request)
+        self.assertEqual(len(results), 3)
+
+    def test_course_strategy_r2_match(self):
+        """[R2] Course Strategy: Input com match deve filtrar corretamente."""
+        request = self.factory.get("/books/search/?q=CS301")
+        results = CourseSearchStrategy().search(request)
+        self.assertEqual(list(results), [self.book3])
+
+    def test_course_strategy_r3_no_match(self):
+        """[R3] Course Strategy: Input sem match deve retornar lista vazia."""
+        request = self.factory.get("/books/search/?q=CS50")
+        results = CourseSearchStrategy().search(request)
+        self.assertEqual(len(results), 0)
+
+    # ==========================================================================
+    # GROUP 2: Combined Strategy (CombinedSearchStrategy) - Rules R4, R5, R6
+    # Total: 3 test cases
+    # ==========================================================================
+
+    def test_combined_strategy_r4_empty(self):
+        """[R4] Combined Strategy: Input vazio deve retornar todos os livros."""
+        request = self.factory.get("/books/search/?q=  ")
+        results = CombinedSearchStrategy().search(request)
+        self.assertCountEqual(results, [self.book1, self.book2, self.book3])
+
+    def test_combined_strategy_r5_match(self):
+        """[R5] Combined Strategy: Match em QUALQUER campo (OU)."""
+        # We'll test a term that matches a specific author
+        request = self.factory.get("/books/search/?q=Alice")
         results = CombinedSearchStrategy().search(request)
         self.assertEqual(list(results), [self.book3])
 
-        request = self.factory.get("/books/search/?q=CS")
+    def test_combined_strategy_r6_no_match(self):
+        """[R6] Combined Strategy: Sem match em NENHUM campo."""
+        request = self.factory.get("/books/search/?q=NonExistentTerm")
         results = CombinedSearchStrategy().search(request)
-        self.assertEqual(set(results), {self.book1, self.book2, self.book3})
+        self.assertEqual(len(results), 0)
 
-    def test_advanced_search_strategy_partial_fields(self):
-        # Only title filter
-        request = self.factory.get("/books/search/?mode=advanced&title=Python&author=&course=")
+    # ==========================================================================
+    # GROUP 3: Advanced Strategy (AdvancedSearchStrategy) - Rules R7, R8, R9
+    # Total: 3 test cases
+    # ==========================================================================
+
+    def test_advanced_strategy_r7_empty(self):
+        """[R7] Advanced Strategy: Todos campos vazios retornam tudo."""
+        # mode=advanced is just illustrative here, what matters are the title/author/course params
+        request = self.factory.get("/books/search/?title=&author=  &course=")
+        results = AdvancedSearchStrategy().search(request)
+        self.assertCountEqual(results, [self.book1, self.book2, self.book3])
+
+    def test_advanced_strategy_r8_success(self):
+        """[R8] Advanced Strategy: Match em TODOS os campos preenchidos (E)."""
+        # Search by Title "Python" AND Course "CS101" (both match book1)
+        request = self.factory.get("/books/search/?title=Python&course=CS101")
         results = AdvancedSearchStrategy().search(request)
         self.assertEqual(list(results), [self.book1])
 
-        # Title + author filter (no match)
-        request = self.factory.get("/books/search/?mode=advanced&title=Python&author=Jane&course=")
+    def test_advanced_strategy_r9_partial_failure(self):
+        """[R9] Advanced Strategy: Fails if ONE of the fields doesn't match (AND Logic)."""
+        # Title "Python" (Exists in book1)
+        # BUT Author "Jane Doe" (Exists in book2, but is not the author of book1)
+        # Expected result: Empty (Intersection failed)
+        request = self.factory.get("/books/search/?title=Python&author=Jane Doe")
         results = AdvancedSearchStrategy().search(request)
         self.assertEqual(len(results), 0)
 
-        # Author + course match
-        request = self.factory.get("/books/search/?mode=advanced&title=&author=Jane&course=CS201")
-        results = AdvancedSearchStrategy().search(request)
-        self.assertEqual(list(results), [self.book2])
+    # ==========================================================================
+    # Extra Tests for BookSearchService dispatching and case insensitivity
+    # ==========================================================================
 
     def test_book_search_service_dispatch(self):
         """Ensure BookSearchService delegates correctly based on mode."""

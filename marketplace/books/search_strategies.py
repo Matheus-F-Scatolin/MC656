@@ -14,7 +14,7 @@ class TitleSearchStrategy(BookSearchStrategy):
     def search(self, request):
         query = request.GET.get("q", "").strip()
         if not query:
-            return Book.objects.none()
+            return Book.objects.all()
         return Book.objects.filter(title__icontains=query).distinct()
 
 
@@ -22,7 +22,7 @@ class AuthorSearchStrategy(BookSearchStrategy):
     def search(self, request):
         query = request.GET.get("q", "").strip()
         if not query:
-            return Book.objects.none()
+            return Book.objects.all()
         return Book.objects.filter(author__icontains=query).distinct()
 
 
@@ -30,7 +30,7 @@ class CourseSearchStrategy(BookSearchStrategy):
     def search(self, request):
         query = request.GET.get("q", "").strip()
         if not query:
-            return Book.objects.none()
+            return Book.objects.all()
         return Book.objects.filter(course__icontains=query).distinct()
 
 
