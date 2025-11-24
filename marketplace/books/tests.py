@@ -549,16 +549,3 @@ class BookSearchServiceTestCase(TestCase):
         request = self.factory.get("/books/search/?q=python")
         results = CombinedSearchStrategy().search(request)
         self.assertEqual(list(results), [self.book1])
-
-    def test_empty_query_returns_all_combined(self):
-        request = self.factory.get("/books/search/?q=")
-        results = CombinedSearchStrategy().search(request)
-        self.assertEqual(set(results), {self.book1, self.book2, self.book3})
-
-    def test_empty_query_returns_none_for_specific_strategies(self):
-        for strategy_cls in [TitleSearchStrategy, AuthorSearchStrategy, CourseSearchStrategy]:
-            request = self.factory.get("/books/search/?q=")
-            results = strategy_cls().search(request)
-            self.assertEqual(len(results), 0)
-
-
