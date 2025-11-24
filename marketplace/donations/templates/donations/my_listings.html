@@ -1,0 +1,73 @@
+{% extends 'books/base.html' %}
+
+{% block title %}My Donation Listings{% endblock %}
+
+{% block content %}
+<h2>Books I'm donating</h2>
+<a href="{% url 'donations:pending_requests' %}" class="btn btn-primary">See books I requested</a>
+
+{% if listings %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1rem; margin-top: 1rem;">
+        {% for listing in listings %}
+            <div style="background: white; padding: 1.5rem; border-radius: 8px;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                        border-left: 4px solid
+                            {% if listing.status == 'A' %}#28a745{% else %}#17a2b8{% endif %};">
+
+                <!-- Book Info -->
+                <h3 style="margin-top: 0;
+                           color: {% if listing.status == 'A' %}#28a745{% else %}#17a2b8{% endif %};">
+                    {{ listing.book.title }}
+                </h3>
+
+                <p style="margin: 0.5rem 0;"><strong>Author:</strong> {{ listing.book.author }}</p>
+                <p style="margin: 0.5rem 0;"><strong>Course:</strong> {{ listing.book.course }}</p>
+
+                <hr>
+
+                {% if listing.status == 'A' %}
+                    <!-- AVAILABLE: show delete option -->
+                    <p style="color: #6c757d; margin-bottom: 1rem;">
+                        <strong>Status:</strong> Available for donation
+                    </p>
+
+                    <form method="POST" action="{% url 'donations:delete_listing' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="book_id" value="{{ listing.book.id }}">
+                        <button type="submit" class="btn btn-warning btn-sm">Cancel Donation</button>
+                    </form>
+
+                {% elif listing.status == 'P' %}
+                    <!-- PENDING: show requester info -->
+                    <p style="color: #6c757d; margin-bottom: 1rem;">
+                        <strong>Status:</strong> Requested
+                    </p>
+
+                    <p style="margin: 0.5rem 0;"><strong>Requested by:</strong> {{ listing.requester.username }}</p>
+                    <p style="margin: 0.5rem 0;"><strong>Email:</strong> {{ listing.requester.email }}</p>
+
+                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                        <form method="POST" action="{% url 'donations:approve_donation' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="listing_id" value="{{ listing.id }}">
+                            <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                        </form>
+
+                        <form method="POST" action="{% url 'donations:reject_donation' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="listing_id" value="{{ listing.id }}">
+                            <button type="submit" class="btn btn-warning btn-sm">Reject</button>
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+
+{% else %}
+    <div style="text-align: center; padding: 3rem; background: white; border-radius: 8px; margin-top: 1rem;">
+        <h3 style="color: #6c757d;">You're not donating any books right now.'</h3>
+        <p style="color: #6c757d;">Make a book available for donation from your bookshelf!</p>
+    </div>
+{% endif %}
+{% endblock %}

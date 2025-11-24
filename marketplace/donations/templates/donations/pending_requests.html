@@ -1,0 +1,41 @@
+{% extends 'books/base.html' %}
+
+{% block title %}Pending Book Requests{% endblock %}
+
+{% block content %}
+<h2>Pending Requests</h2>
+
+<a href="{% url 'donations:my_listings' %}" class="btn btn-primary">See books I'm donating</a>
+{% if listings %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1rem; margin-top: 1rem;">
+        {% for listing in listings %}
+            <div style="background: white; padding: 1.5rem; border-radius: 8px;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                        border-left: 4px solid #ffc107;">
+                
+                <!-- Book Info -->
+                <h3 style="margin-top: 0; color: #ffc107;">{{ listing.book.title }}</h3>
+                <p style="margin: 0.5rem 0;"><strong>Author:</strong> {{ listing.book.author }}</p>
+                <p style="margin: 0.5rem 0;"><strong>Course:</strong> {{ listing.book.course }}</p>
+
+                <hr>
+
+                <!-- Donor Info -->
+                <p style="margin: 0.5rem 0;"><strong>Donor:</strong> {{ listing.donor.username }}</p>
+                <p style="margin: 0.5rem 0;"><strong>Email:</strong> {{ listing.donor.email }}</p>
+
+                <form method="POST" action="{% url 'donations:cancel_request' %}" style="margin-top: 1rem;">
+                    {% csrf_token %}
+                    <input type="hidden" name="listing_id" value="{{ listing.id }}">
+                    <button type="submit" class="btn btn-danger btn-sm">Cancel Request</button>
+                </form>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div style="text-align: center; padding: 3rem; background: white; border-radius: 8px; margin-top: 1rem;">
+        <h3 style="color: #6c757d;">You have no pending requests</h3>
+        <p style="color: #6c757d;">Request a book from the donation catalog!</p>
+    </div>
+{% endif %}
+{% endblock %}

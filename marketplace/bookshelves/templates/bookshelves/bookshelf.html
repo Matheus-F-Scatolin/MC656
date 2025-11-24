@@ -41,10 +41,18 @@
                 </p>
 
                 {% if item.book.id %}
-                <form method="POST" action="{% url 'bookshelves:remove_from_bookshelf' item.book.id %}">
-                    {% csrf_token %}
-                    <button type="submit">Remove</button>
-                </form>
+                <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                        <form method="POST" action="{% url 'bookshelves:remove_from_bookshelf' item.book.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary btn-sm">Remove</button>
+                        </form>
+
+                        <form method="POST" action="{% url 'donations:add_listing' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="book_id" value="{{ item.book.id }}">
+                            <button type="submit" class="btn btn-warning btn-sm">Donate</button>
+                        </form>
+                    </div>
                 {% endif %}
             </div>
             {% endfor %}

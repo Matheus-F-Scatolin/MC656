@@ -15,7 +15,7 @@ def remove_from_bookshelf(request, book_id):
     BookshelfItem.objects.filter(book=book, bookshelf=bookshelf).delete()
     return redirect('bookshelves:bookshelf')
 
-@csrf_exempt
+
 @login_required
 def update_tag(request):
     if request.method == 'POST':
