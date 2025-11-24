@@ -37,13 +37,13 @@ class DonationListing(models.Model):
             raise ValueError('Book cannot be None')
         if user is None:
             raise ValueError('User cannot be None')
-
-        listing = DonationListing(book=book, donor=user, requester=None, status=DonationStatus.AVAILABLE)
-        listing.save()
+        return DonationListing.objects.get_or_create(book=book, donor=user)[0]
 
     def request_donation(self, requesting_user):
         if requesting_user is None:
             raise ValueError('requesting_user cannot be None')
+        if requesting_user == self.donor:
+            raise ValueError('Cannot request your own book')
         if self.status != DonationStatus.AVAILABLE:
             raise ValueError("Requested book is not available")
 

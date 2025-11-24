@@ -28,10 +28,7 @@ def add_listing(request):
     book_id = request.POST.get("book_id")
     book = get_object_or_404(Book, id=book_id)
 
-    try:
-        DonationListing.add_listing(book, request.user)
-    except IntegrityError as e:
-        pass  # let the user believe it's the first time they're doing this...
+    DonationListing.add_listing(book, request.user)
 
     return redirect('donations:my_listings')
 
@@ -74,7 +71,7 @@ def approve_donation(request):
     listing.approve_donation()
     listing.save()
 
-    redirect('donations:my_listings')
+    return redirect('donations:my_listings')
 
 
 @login_required
