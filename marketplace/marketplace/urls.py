@@ -22,5 +22,6 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('books/', include('books.urls')),
     path('bookshelves/', include('bookshelves.urls')),
+    path("donations/", include("donations.urls")),
     path('', include('accounts.urls')),  # Make landing page the default
 ]

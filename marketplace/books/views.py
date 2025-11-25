@@ -13,6 +13,8 @@ from .search_strategies import BookSearchService
 from .utils import validate_isbn
 from bookshelves.models import Bookshelf, BookshelfItem
 
+from donations.models import DonationListing
+
 
 @login_required
 def book_list(request):
@@ -27,9 +29,11 @@ def search_books(request):
     mode = request.GET.get("mode", "combined")
     search_service = BookSearchService(strategy_name=mode)
     books = search_service.search(request)
+    listings =  DonationListing.objects.filter(book__in=books, status='A').exclude(donor=request.user)
 
     context = {
         "books": books,
+        "listings": listings,
         "query": request.GET.get("q", "").strip(),
         "mode": mode,
         "is_search": True,
@@ -116,6 +120,7 @@ def add_to_shelf(request, book_id):
             # In a production app, you might want to show an error message to the user
             # For now, we'll just redirect back to the book list
             return redirect('book_list')
+
 
     return redirect('book_list')
 
