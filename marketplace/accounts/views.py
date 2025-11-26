@@ -7,6 +7,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 import json
 
+from .validators import validate_password, get_password_requirements
+
 # Create your views here.
 
 def landing_page(request):
@@ -31,6 +33,11 @@ def signup_view(request):
         if password != confirm_password:
             error_message = "Passwords do not match."
             return render(request, 'accounts/signup.html', {'error': error_message})
+        
+        # Validate password strength
+        is_valid, validation_error = validate_password(password)
+        if not is_valid:
+            return render(request, 'accounts/signup.html', {'error': validation_error})
         
         if User.objects.filter(username=username).exists():
             error_message = "Username already exists."
@@ -96,6 +103,11 @@ def signup_api(request):
         
         if password != confirm_password:
             return JsonResponse({'error': 'Passwords do not match.'}, status=400)
+        
+        # Validate password strength
+        is_valid, validation_error = validate_password(password)
+        if not is_valid:
+            return JsonResponse({'error': validation_error}, status=400)
         
         if User.objects.filter(username=username).exists():
             return JsonResponse({'error': 'Username already exists.'}, status=400)

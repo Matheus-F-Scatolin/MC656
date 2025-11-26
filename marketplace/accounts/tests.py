@@ -3,7 +3,87 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 import json
 
+from .validators import validate_password, get_password_requirements
+
 # Create your tests here.
+
+class PasswordValidatorTestCase(TestCase):
+    """Test cases for password validation."""
+    
+    def test_valid_password(self):
+        """Test that a valid password passes validation."""
+        valid_passwords = [
+            'TestPass1!',
+            'MyP@ssw0rd',
+            'Secure#123',
+            'C0mplex&Pass',
+            'Valid!Pass123',
+            'Aa123!'
+        ]
+        
+        for password in valid_passwords:
+            is_valid, error = validate_password(password)
+            self.assertTrue(is_valid, f"Password '{password}' should be valid but got error: {error}")
+            self.assertIsNone(error)
+    
+    def test_password_too_short(self):
+        """Test that passwords shorter than 6 characters are rejected."""
+        short_passwords = ['Ab1!', 'Tc2@', 'Xy3#']
+        
+        for password in short_passwords:
+            is_valid, error = validate_password(password)
+            self.assertFalse(is_valid)
+            self.assertIn('at least 6 characters', error)
+    
+    def test_password_no_uppercase(self):
+        """Test that passwords without uppercase letters are rejected."""
+        is_valid, error = validate_password('testpass1!')
+        self.assertFalse(is_valid)
+        self.assertIn('uppercase letter', error)
+    
+    def test_password_no_lowercase(self):
+        """Test that passwords without lowercase letters are rejected."""
+        is_valid, error = validate_password('TESTPASS1!')
+        self.assertFalse(is_valid)
+        self.assertIn('lowercase letter', error)
+    
+    def test_password_no_digit(self):
+        """Test that passwords without digits are rejected."""
+        is_valid, error = validate_password('TestPass!')
+        self.assertFalse(is_valid)
+        self.assertIn('digit', error)
+    
+    def test_password_no_special_char(self):
+        """Test that passwords without special characters are rejected."""
+        is_valid, error = validate_password('TestPass123')
+        self.assertFalse(is_valid)
+        self.assertIn('special character', error)
+    
+    def test_password_empty(self):
+        """Test that empty passwords are rejected."""
+        is_valid, error = validate_password('')
+        self.assertFalse(is_valid)
+        self.assertIn('required', error)
+    
+    def test_password_none(self):
+        """Test that None passwords are rejected."""
+        is_valid, error = validate_password(None)
+        self.assertFalse(is_valid)
+        self.assertIn('required', error)
+    
+    def test_password_1char_too_short(self):
+        """Test that a password with lenght 5 is rejected."""
+        is_valid, error = validate_password('Aa12!')
+        self.assertFalse(is_valid)
+        self.assertIn('at least 6 characters', error)
+    
+    def test_get_password_requirements(self):
+        """Test that password requirements are returned correctly."""
+        requirements = get_password_requirements()
+        self.assertIsInstance(requirements, list)
+        self.assertEqual(len(requirements), 5)
+        self.assertIn('6 characters', requirements[0])
+
 
 class AccountModelTestCase(TestCase):
     """Test cases for User model operations."""
@@ -13,13 +93,13 @@ class AccountModelTestCase(TestCase):
         user = User.objects.create_user(
             username="testuser",
             email="test@example.com",
-            password="testpassword123"
+            password="TestPass123!"
         )
         
         # Verify the user was saved correctly
         self.assertEqual(user.username, "testuser")
         self.assertEqual(user.email, "test@example.com")
-        self.assertTrue(user.check_password("testpassword123"))
+        self.assertTrue(user.check_password("TestPass123!"))
         self.assertIsNotNone(user.date_joined)
         
         # Verify the user exists in the database
@@ -32,7 +112,7 @@ class AccountModelTestCase(TestCase):
         user = User.objects.create_user(
             username="testuser2",
             email="test2@example.com",
-            password="testpassword123"
+            password="TestPass123!"
         )
         self.assertEqual(str(user), "testuser2")
     
@@ -41,7 +121,7 @@ class AccountModelTestCase(TestCase):
         User.objects.create_user(
             username="uniqueuser",
             email="first@example.com",
-            password="password123"
+            password="Password1!"
         )
         
         # Attempting to create another user with the same username should work
@@ -49,7 +129,7 @@ class AccountModelTestCase(TestCase):
         user2 = User.objects.create_user(
             username="uniqueuser2",
             email="second@example.com",
-            password="password123"
+            password="Password1!"
         )
         
         self.assertEqual(User.objects.count(), 2)
@@ -64,7 +144,7 @@ class AuthViewTestCase(TestCase):
         self.test_user = User.objects.create_user(
             username="existinguser",
             email="existing@example.com",
-            password="testpassword123"
+            password="TestPass123!"
         )
     
     def test_signup_view_get(self):
@@ -85,8 +165,8 @@ class AuthViewTestCase(TestCase):
         response = self.client.post(reverse('signup'), {
             'username': 'newuser',
             'email': 'newuser@example.com',
-            'password': 'newpassword123',
-            'confirm_password': 'newpassword123'
+            'password': 'NewPass123!',
+            'confirm_password': 'NewPass123!'
         })
         
         # Check that the user was created
@@ -98,7 +178,7 @@ class AuthViewTestCase(TestCase):
         # Verify the user was created with correct data
         new_user = User.objects.get(username='newuser')
         self.assertEqual(new_user.email, 'newuser@example.com')
-        self.assertTrue(new_user.check_password('newpassword123'))
+        self.assertTrue(new_user.check_password('NewPass123!'))
     
     def test_signup_post_missing_fields(self):
         """Test signup with missing fields."""
@@ -107,8 +187,8 @@ class AuthViewTestCase(TestCase):
         # Test with missing username
         response = self.client.post(reverse('signup'), {
             'email': 'test@example.com',
-            'password': 'password123',
-            'confirm_password': 'password123'
+            'password': 'TestPass123!',
+            'confirm_password': 'TestPass123!'
         })
         
         self.assertEqual(User.objects.count(), initial_count)
@@ -118,7 +198,7 @@ class AuthViewTestCase(TestCase):
         response = self.client.post(reverse('signup'), {
             'username': 'testuser',
             'email': 'test@example.com',
-            'confirm_password': 'password123'
+            'confirm_password': 'TestPass123!'
         })
         
         self.assertEqual(User.objects.count(), initial_count)
@@ -131,8 +211,8 @@ class AuthViewTestCase(TestCase):
         response = self.client.post(reverse('signup'), {
             'username': 'testuser',
             'email': 'test@example.com',
-            'password': 'password123',
-            'confirm_password': 'differentpassword'
+            'password': 'TestPass123!',
+            'confirm_password': 'DifferentPass123!'
         })
         
         self.assertEqual(User.objects.count(), initial_count)
@@ -145,8 +225,8 @@ class AuthViewTestCase(TestCase):
         response = self.client.post(reverse('signup'), {
             'username': 'existinguser',  # This user already exists
             'email': 'newemail@example.com',
-            'password': 'password123',
-            'confirm_password': 'password123'
+            'password': 'TestPass123!',
+            'confirm_password': 'TestPass123!'
         })
         
         self.assertEqual(User.objects.count(), initial_count)
@@ -159,12 +239,82 @@ class AuthViewTestCase(TestCase):
         response = self.client.post(reverse('signup'), {
             'username': 'newusername',
             'email': 'existing@example.com',  # This email already exists
-            'password': 'password123',
-            'confirm_password': 'password123'
+            'password': 'TestPass123!',
+            'confirm_password': 'TestPass123!'
         })
         
         self.assertEqual(User.objects.count(), initial_count)
         self.assertContains(response, "Email already registered.")
+    
+    def test_signup_weak_password_too_short(self):
+        """Test signup with a password that's too short."""
+        initial_count = User.objects.count()
+        
+        response = self.client.post(reverse('signup'), {
+            'username': 'testuser',
+            'email': 'test@example.com',
+            'password': 'Aa1!',  # Only 4 characters
+            'confirm_password': 'Aa1!'
+        })
+        
+        self.assertEqual(User.objects.count(), initial_count)
+        self.assertContains(response, "at least 6 characters")
+    
+    def test_signup_weak_password_no_uppercase(self):
+        """Test signup with a password missing uppercase letter."""
+        initial_count = User.objects.count()
+        
+        response = self.client.post(reverse('signup'), {
+            'username': 'testuser',
+            'email': 'test@example.com',
+            'password': 'testpass123!',
+            'confirm_password': 'testpass123!'
+        })
+        
+        self.assertEqual(User.objects.count(), initial_count)
+        self.assertContains(response, "uppercase letter")
+    
+    def test_signup_weak_password_no_lowercase(self):
+        """Test signup with a password missing lowercase letter."""
+        initial_count = User.objects.count()
+        
+        response = self.client.post(reverse('signup'), {
+            'username': 'testuser',
+            'email': 'test@example.com',
+            'password': 'TESTPASS123!',
+            'confirm_password': 'TESTPASS123!'
+        })
+        
+        self.assertEqual(User.objects.count(), initial_count)
+        self.assertContains(response, "lowercase letter")
+    
+    def test_signup_weak_password_no_digit(self):
+        """Test signup with a password missing a digit."""
+        initial_count = User.objects.count()
+        
+        response = self.client.post(reverse('signup'), {
+            'username': 'testuser',
+            'email': 'test@example.com',
+            'password': 'TestPass!',
+            'confirm_password': 'TestPass!'
+        })
+        
+        self.assertEqual(User.objects.count(), initial_count)
+        self.assertContains(response, "digit")
+    
+    def test_signup_weak_password_no_special_char(self):
+        """Test signup with a password missing a special character."""
+        initial_count = User.objects.count()
+        
+        response = self.client.post(reverse('signup'), {
+            'username': 'testuser',
+            'email': 'test@example.com',
+            'password': 'TestPass123',
+            'confirm_password': 'TestPass123'
+        })
+        
+        self.assertEqual(User.objects.count(), initial_count)
+        self.assertContains(response, "special character")
     
     def test_login_view_get(self):
         """Test GET request to login view."""
@@ -179,7 +329,7 @@ class AuthViewTestCase(TestCase):
         """Test successful user login."""
         response = self.client.post(reverse('login'), {
             'username': 'existinguser',
-            'password': 'testpassword123'
+            'password': 'TestPass123!'
         })
         
         # Check that the user was redirected to book list
@@ -216,7 +366,7 @@ class AuthViewTestCase(TestCase):
         
         # Test with missing username
         response = self.client.post(reverse('login'), {
-            'password': 'testpassword123'
+            'password': 'TestPass123!'
         })
         
         self.assertEqual(response.status_code, 200)
@@ -225,7 +375,7 @@ class AuthViewTestCase(TestCase):
     def test_logout_view(self):
         """Test user logout."""
         # First, log in the user
-        self.client.login(username='existinguser', password='testpassword123')
+        self.client.login(username='existinguser', password='TestPass123!')
         
         # Then logout
         response = self.client.get(reverse('logout'))
@@ -243,7 +393,7 @@ class AuthAPITestCase(TestCase):
         self.test_user = User.objects.create_user(
             username="apiuser",
             email="api@example.com",
-            password="apipassword123"
+            password="ApiPass123!"
         )
     
     def test_signup_api_success(self):
@@ -255,8 +405,8 @@ class AuthAPITestCase(TestCase):
             data=json.dumps({
                 'username': 'newapi_user',
                 'email': 'newapi@example.com',
-                'password': 'newpassword123',
-                'confirm_password': 'newpassword123'
+                'password': 'NewApi123!',
+                'confirm_password': 'NewApi123!'
             }),
             content_type='application/json'
         )
@@ -293,13 +443,36 @@ class AuthAPITestCase(TestCase):
         self.assertIn('error', data)
         self.assertEqual(data['error'], 'All fields are required.')
     
+    def test_signup_api_weak_password(self):
+        """Test signup API with weak password."""
+        initial_count = User.objects.count()
+        
+        # Test password without special character
+        response = self.client.post(
+            reverse('signup_api'),
+            data=json.dumps({
+                'username': 'testuser',
+                'email': 'test@example.com',
+                'password': 'TestPass123',
+                'confirm_password': 'TestPass123'
+            }),
+            content_type='application/json'
+        )
+        
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(User.objects.count(), initial_count)
+        
+        data = json.loads(response.content)
+        self.assertIn('error', data)
+        self.assertIn('special character', data['error'])
+    
     def test_login_api_success(self):
         """Test successful user login via API."""
         response = self.client.post(
             reverse('login_api'),
             data=json.dumps({
                 'username': 'apiuser',
-                'password': 'apipassword123'
+                'password': 'ApiPass123!'
             }),
             content_type='application/json'
         )
@@ -354,7 +527,7 @@ class LandingPageTestCase(TestCase):
         self.test_user = User.objects.create_user(
             username="testuser",
             email="test@example.com",
-            password="testpassword123"
+            password="TestPass123!"
         )
     
     def test_landing_page_anonymous(self):
@@ -369,7 +542,7 @@ class LandingPageTestCase(TestCase):
     
     def test_landing_page_authenticated_redirect(self):
         """Test that authenticated users are redirected to book list."""
-        self.client.login(username='testuser', password='testpassword123')
+        self.client.login(username='testuser', password='TestPass123!')
         
         response = self.client.get(reverse('landing'))
         
