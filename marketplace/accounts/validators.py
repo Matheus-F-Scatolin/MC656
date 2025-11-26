@@ -7,7 +7,7 @@ import re
 def validate_password(password):
     """
     Validate password strength based on the following requirements:
-    - At least 6 characters long
+    - Between 6 and 15 characters long
     - Contains at least one uppercase letter
     - Contains at least one lowercase letter
     - Contains at least one digit
@@ -24,6 +24,9 @@ def validate_password(password):
     
     if len(password) < 6:
         return False, "Password must be at least 6 characters long."
+    
+    if len(password) > 15:
+        return False, "Password must be no more than 15 characters long."
     
     if not re.search(r'[A-Z]', password):
         return False, "Password must contain at least one uppercase letter."
@@ -49,7 +52,7 @@ def get_password_requirements():
         list: List of password requirement strings
     """
     return [
-        "At least 6 characters long",
+        "Between 6 and 15 characters long",
         "Contains at least one uppercase letter (A-Z)",
         "Contains at least one lowercase letter (a-z)",
         "Contains at least one digit (0-9)",

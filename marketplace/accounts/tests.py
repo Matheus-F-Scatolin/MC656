@@ -35,6 +35,47 @@ class PasswordValidatorTestCase(TestCase):
             self.assertFalse(is_valid)
             self.assertIn('at least 6 characters', error)
     
+    def test_password_length_boundary_5_chars(self):
+        """Test that a password with exactly 5 characters fails (boundary test)."""
+        password = 'Abc1!'  # 5 characters - all requirements met except length
+        is_valid, error = validate_password(password)
+        self.assertFalse(is_valid)
+        self.assertIn('at least 6 characters', error)
+    
+    def test_password_length_boundary_6_chars(self):
+        """Test that a password with exactly 6 characters passes (boundary test)."""
+        password = 'Abc12!'  # 6 characters - minimum valid length
+        is_valid, error = validate_password(password)
+        self.assertTrue(is_valid)
+        self.assertIsNone(error)
+    
+    def test_password_length_boundary_15_chars(self):
+        """Test that a password with exactly 15 characters passes (boundary test)."""
+        password = 'Abcdefg12345!@#'  # 15 characters - maximum valid length
+        is_valid, error = validate_password(password)
+        self.assertTrue(is_valid)
+        self.assertIsNone(error)
+    
+    def test_password_length_boundary_16_chars(self):
+        """Test that a password with exactly 16 characters fails (boundary test)."""
+        password = 'Abcdefg123456!@#'  # 16 characters - exceeds maximum
+        is_valid, error = validate_password(password)
+        self.assertFalse(is_valid)
+        self.assertIn('no more than 15 characters', error)
+    
+    def test_password_too_long(self):
+        """Test that passwords longer than 15 characters are rejected."""
+        long_passwords = [
+            'TestPassword123!@#$',  # 19 chars
+            'VeryLongPassword1!',   # 18 chars
+            'ExtremelyLongPass1!'   # 20 chars
+        ]
+        
+        for password in long_passwords:
+            is_valid, error = validate_password(password)
+            self.assertFalse(is_valid)
+            self.assertIn('no more than 15 characters', error)
+    
     def test_password_no_uppercase(self):
         """Test that passwords without uppercase letters are rejected."""
         is_valid, error = validate_password('testpass1!')
@@ -82,7 +123,7 @@ class PasswordValidatorTestCase(TestCase):
         requirements = get_password_requirements()
         self.assertIsInstance(requirements, list)
         self.assertEqual(len(requirements), 5)
-        self.assertIn('6 characters', requirements[0])
+        self.assertIn('6 and 15 characters', requirements[0])
 
 
 class AccountModelTestCase(TestCase):
@@ -316,6 +357,78 @@ class AuthViewTestCase(TestCase):
         self.assertEqual(User.objects.count(), initial_count)
         self.assertContains(response, "special character")
     
+    def test_signup_password_boundary_5_chars(self):
+        """Test signup with exactly 5 characters (boundary - should fail)."""
+        initial_count = User.objects.count()
+        
+        response = self.client.post(reverse('signup'), {
+            'username': 'testuser',
+            'email': 'test@example.com',
+            'password': 'Abc1!',
+            'confirm_password': 'Abc1!'
+        })
+        
+        self.assertEqual(User.objects.count(), initial_count)
+        self.assertContains(response, "at least 6 characters")
+    
+    def test_signup_password_boundary_6_chars(self):
+        """Test signup with exactly 6 characters (boundary - should pass)."""
+        initial_count = User.objects.count()
+        
+        response = self.client.post(reverse('signup'), {
+            'username': 'testuser',
+            'email': 'test@example.com',
+            'password': 'Abc12!',
+            'confirm_password': 'Abc12!'
+        })
+        
+        # Should succeed and create user
+        self.assertEqual(User.objects.count(), initial_count + 1)
+        self.assertRedirects(response, reverse('login'))
+    
+    def test_signup_password_boundary_15_chars(self):
+        """Test signup with exactly 15 characters (boundary - should pass)."""
+        initial_count = User.objects.count()
+        
+        response = self.client.post(reverse('signup'), {
+            'username': 'testuser',
+            'email': 'test@example.com',
+            'password': 'Abcdefg12345!@#',
+            'confirm_password': 'Abcdefg12345!@#'
+        })
+        
+        # Should succeed and create user
+        self.assertEqual(User.objects.count(), initial_count + 1)
+        self.assertRedirects(response, reverse('login'))
+    
+    def test_signup_password_boundary_16_chars(self):
+        """Test signup with exactly 16 characters (boundary - should fail)."""
+        initial_count = User.objects.count()
+        
+        response = self.client.post(reverse('signup'), {
+            'username': 'testuser',
+            'email': 'test@example.com',
+            'password': 'Abcdefg123456!@#',
+            'confirm_password': 'Abcdefg123456!@#'
+        })
+        
+        self.assertEqual(User.objects.count(), initial_count)
+        self.assertContains(response, "no more than 15 characters")
+    
+    def test_signup_password_too_long(self):
+        """Test signup with a password that's too long."""
+        initial_count = User.objects.count()
+        
+        response = self.client.post(reverse('signup'), {
+            'username': 'testuser',
+            'email': 'test@example.com',
+            'password': 'TestPassword123!@#$%',  # 20 characters
+            'confirm_password': 'TestPassword123!@#$%'
+        })
+        
+        self.assertEqual(User.objects.count(), initial_count)
+        self.assertContains(response, "no more than 15 characters")
+    
     def test_login_view_get(self):
         """Test GET request to login view."""
         response = self.client.get(reverse('login'))
@@ -465,6 +578,92 @@ class AuthAPITestCase(TestCase):
         data = json.loads(response.content)
         self.assertIn('error', data)
         self.assertIn('special character', data['error'])
+    
+    def test_signup_api_password_boundary_5_chars(self):
+        """Test API signup with exactly 5 characters (boundary - should fail)."""
+        initial_count = User.objects.count()
+        
+        response = self.client.post(
+            reverse('signup_api'),
+            data=json.dumps({
+                'username': 'testuser',
+                'email': 'test@example.com',
+                'password': 'Abc1!',
+                'confirm_password': 'Abc1!'
+            }),
+            content_type='application/json'
+        )
+        
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(User.objects.count(), initial_count)
+        
+        data = json.loads(response.content)
+        self.assertIn('error', data)
+        self.assertIn('at least 6 characters', data['error'])
+    
+    def test_signup_api_password_boundary_6_chars(self):
+        """Test API signup with exactly 6 characters (boundary - should pass)."""
+        initial_count = User.objects.count()
+        
+        response = self.client.post(
+            reverse('signup_api'),
+            data=json.dumps({
+                'username': 'testuser',
+                'email': 'test@example.com',
+                'password': 'Abc12!',
+                'confirm_password': 'Abc12!'
+            }),
+            content_type='application/json'
+        )
+        
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(User.objects.count(), initial_count + 1)
+        
+        data = json.loads(response.content)
+        self.assertIn('message', data)
+    
+    def test_signup_api_password_boundary_15_chars(self):
+        """Test API signup with exactly 15 characters (boundary - should pass)."""
+        initial_count = User.objects.count()
+        
+        response = self.client.post(
+            reverse('signup_api'),
+            data=json.dumps({
+                'username': 'testuser2',
+                'email': 'test2@example.com',
+                'password': 'Abcdefg12345!@#',
+                'confirm_password': 'Abcdefg12345!@#'
+            }),
+            content_type='application/json'
+        )
+        
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(User.objects.count(), initial_count + 1)
+        
+        data = json.loads(response.content)
+        self.assertIn('message', data)
+    
+    def test_signup_api_password_boundary_16_chars(self):
+        """Test API signup with exactly 16 characters (boundary - should fail)."""
+        initial_count = User.objects.count()
+        
+        response = self.client.post(
+            reverse('signup_api'),
+            data=json.dumps({
+                'username': 'testuser',
+                'email': 'test@example.com',
+                'password': 'Abcdefg123456!@#',
+                'confirm_password': 'Abcdefg123456!@#'
+            }),
+            content_type='application/json'
+        )
+        
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(User.objects.count(), initial_count)
+        
+        data = json.loads(response.content)
+        self.assertIn('error', data)
+        self.assertIn('no more than 15 characters', data['error'])
     
     def test_login_api_success(self):
         """Test successful user login via API."""
