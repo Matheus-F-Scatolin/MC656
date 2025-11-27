@@ -13,14 +13,15 @@ from .search_strategies import BookSearchService
 from .utils import validate_isbn
 from bookshelves.models import Bookshelf, BookshelfItem
 
-from donations.models import DonationListing
+from donations.models import DonationListing, DonationStatus
 
 
 @login_required
 def book_list(request):
     """View to display all available books."""
     books = Book.objects.all()
-    return render(request, 'books/book_list.html', {'books': books})
+    listings = DonationListing.objects.filter(status=DonationStatus.AVAILABLE).exclude(donor=request.user)
+    return render(request, 'books/book_list.html', {'listings': listings, 'books': books})
 
 
 @login_required
@@ -29,7 +30,7 @@ def search_books(request):
     mode = request.GET.get("mode", "combined")
     search_service = BookSearchService(strategy_name=mode)
     books = search_service.search(request)
-    listings =  DonationListing.objects.filter(book__in=books, status='A').exclude(donor=request.user)
+    listings =  DonationListing.objects.filter(book__in=books, status=DonationStatus.AVAILABLE).exclude(donor=request.user)
 
     context = {
         "books": books,
