@@ -7,6 +7,32 @@
 
 {% if books %}
     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; margin-top: 1rem;">
+        {% for listing in listings %}
+            <div style="background: white; padding: 1.5rem; border-radius: 8px;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                        border-left: 4px solid #ffc107;">
+
+                <!-- Book Info -->
+                <h3 style="margin-top: 0; color: #ffc107;">{{ listing.book.title }}</h3>
+                <p style="margin: 0.5rem 0;"><strong>Author:</strong> {{ listing.book.author }}</p>
+                <p style="margin: 0.5rem 0;"><strong>Course:</strong> {{ listing.book.course }}</p>
+
+                <hr>
+
+                <!-- Donor Info -->
+                <p style="margin: 0.5rem 0;"><strong>Donor:</strong> {{ listing.donor.username }}</p>
+                <p style="margin: 0.5rem 0;"><strong>Email:</strong> {{ listing.donor.email }}</p>
+
+                <form method="POST" action="{% url 'donations:request_book' %}" style="margin-top: 1rem;">
+                    {% csrf_token %}
+                    <input type="hidden" name="listing_id" value="{{ listing.id }}">
+                    <button type="submit" class="btn btn-danger btn-sm">Request Book</button>
+                </form>
+
+            </div>
+        {% endfor %}
+
+
         {% for book in books %}
             <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-left: 4px solid #007bff;">
                 <h3 style="margin-top: 0; color: #007bff;">{{ book.title }}</h3>
@@ -39,7 +65,4 @@
     </div>
 {% endif %}
 
-<div style="margin-top: 2rem; text-align: center;">
-    <a href="{% url 'register_book' %}" class="btn btn-success">Register New Book</a>
-</div>
 {% endblock %}
