@@ -522,7 +522,7 @@ class BookSearchServiceTestCase(TestCase):
         self.assertEqual(len(results), 0)
 
     # ==========================================================================
-    # Extra Tests for BookSearchService dispatching and case insensitivity
+    # Extra Tests for BookSearchService dispatching, case insensitivity and setting strategies
     # ==========================================================================
 
     def test_book_search_service_dispatch(self):
@@ -549,3 +549,23 @@ class BookSearchServiceTestCase(TestCase):
         request = self.factory.get("/books/search/?q=python")
         results = CombinedSearchStrategy().search(request)
         self.assertEqual(list(results), [self.book1])
+
+    def test_set_strategy_string(self):
+        service = BookSearchService('author')
+        request = self.factory.get("/books/search/?q=John Smith")
+        results = service.search(request)
+        self.assertEqual(len(results), 1)
+
+        service.set_strategy('title')
+        results = service.search(request)
+        self.assertEqual(len(results), 0)
+
+    def test_set_strategy_object(self):
+        service = BookSearchService(AuthorSearchStrategy())
+        request = self.factory.get("/books/search/?q=John Smith")
+        results = service.search(request)
+        self.assertEqual(len(results), 1)
+
+        service.set_strategy(TitleSearchStrategy())
+        results = service.search(request)
+        self.assertEqual(len(results), 0)

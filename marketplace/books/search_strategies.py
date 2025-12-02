@@ -67,15 +67,26 @@ class AdvancedSearchStrategy(BookSearchStrategy):
 # === Context / Service ===
 class BookSearchService:
     """Context class selecting and delegating to the right search strategy."""
-    def __init__(self, strategy_name):
-        strategies = {
-            "title": TitleSearchStrategy(),
-            "author": AuthorSearchStrategy(),
-            "course": CourseSearchStrategy(),
-            "combined": CombinedSearchStrategy(),
-            "advanced": AdvancedSearchStrategy(),
+
+    def __init__(self, strategy='combined'):
+        self.strategies = {
+            'title': TitleSearchStrategy(),
+            'author': AuthorSearchStrategy(),
+            'course': CourseSearchStrategy(),
+            'combined': CombinedSearchStrategy(),
+            'advanced': AdvancedSearchStrategy(),
         }
-        self.strategy = strategies.get(strategy_name, CombinedSearchStrategy())
+
+        if isinstance(strategy, BookSearchStrategy):
+            self.strategy = strategy
+        else:
+            self.strategy = self.strategies.get(strategy, self.strategies['combined'])
 
     def search(self, request):
         return self.strategy.search(request)
+
+    def set_strategy(self, strategy):
+        if isinstance(strategy, BookSearchStrategy):
+            self.strategy = strategy
+        else:
+            self.strategy = self.strategies.get(strategy, self.strategies['combined'])

@@ -28,7 +28,8 @@ def book_list(request):
 def search_books(request):
     """View to search for books using strategy-based logic."""
     mode = request.GET.get("mode", "combined")
-    search_service = BookSearchService(strategy_name=mode)
+    search_service = BookSearchService()
+    search_service.set_strategy(mode)
     books = search_service.search(request)
     listings =  DonationListing.objects.filter(book__in=books, status=DonationStatus.AVAILABLE).exclude(donor=request.user)
 
@@ -152,7 +153,7 @@ def book_list_api(request):
 def search_books_api(request):
     """API endpoint for searching books using strategy-based logic."""
     mode = request.GET.get("mode", "combined")
-    search_service = BookSearchService(strategy_name=mode)
+    search_service = BookSearchService(mode)
     books = search_service.search(request)
 
     book_data = [
