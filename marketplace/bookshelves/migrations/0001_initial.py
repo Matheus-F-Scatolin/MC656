@@ -51,6 +51,14 @@ class Migration(migrations.Migration):
                 ),
                 ("added_at", models.DateTimeField(auto_now_add=True)),
                 (
+                    "tag",
+                    models.CharField(
+                        choices=[('0', 'Untagged'), ('1', 'Wanted'), ('2', 'Reading'), ('3', 'Read')],
+                        default='0',
+                        max_length=1,
+                    ),
+                ),
+                (
                     "book",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE, to="books.book"

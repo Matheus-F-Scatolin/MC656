@@ -83,11 +83,11 @@ class BookshelfViewsTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertIn('/login', response.url)
 
-    def test_update_tag_backward_compatibility_integer(self):
-        """Should handle integer tag values for backward compatibility."""
+    def test_update_tag_with_string_value(self):
+        """Should handle string tag values correctly."""
         self.client.login(username='tester', password='pass123')
         url = reverse('bookshelves:update_tag')
-        payload = {'id': self.item.id, 'tag': 2}  # Integer value
+        payload = {'id': self.item.id, 'tag': '2'}  # String value
         response = self.client.post(
             url,
             data=json.dumps(payload),
@@ -95,7 +95,7 @@ class BookshelfViewsTest(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.item.refresh_from_db()
-        self.assertEqual(self.item.tag, BookshelfTag.READING)  # Should be stored as string
+        self.assertEqual(self.item.tag, BookshelfTag.READING)
         self.assertJSONEqual(response.content, {'success': True})
 
     def test_update_tag_invalid_value(self):
@@ -225,16 +225,16 @@ class BookshelfModelTest(TestCase):
         self.assertEqual(item.tag, BookshelfTag.READ)  # String value '3'
         self.assertIsInstance(item.tag, str)  # Should be string now, not int
     
-    def test_add_or_update_item_backward_compatibility_integer(self):
-        """Test that integer tags are converted to strings for backward compatibility."""
+    def test_add_or_update_item_with_textchoices_value(self):
+        """Test that BookshelfTag TextChoices values work correctly."""
         item, created = self.bookshelf.add_or_update_item(
             book=self.book1, 
-            tag=3,  # Integer value (backward compatibility)
+            tag=BookshelfTag.READ,  # TextChoices value
             actor=self.user
         )
         
         self.assertTrue(created)
-        self.assertEqual(item.tag, BookshelfTag.READ)  # Should be converted to string '3'
+        self.assertEqual(item.tag, BookshelfTag.READ)
         self.assertIsInstance(item.tag, str)
     
     def test_add_or_update_item_none_book_raises_error(self):
@@ -250,7 +250,7 @@ class BookshelfModelTest(TestCase):
     
     def test_add_or_update_item_invalid_tag_raises_error(self):
         """Test that invalid tag values raise ValueError."""
-        invalid_tags = ['invalid', '99', None, [], {}]
+        invalid_tags = ['invalid', '99', None, [], {}, 123]  # Including integer now that it's not supported
         
         for invalid_tag in invalid_tags:
             with self.assertRaises(ValueError) as context:
@@ -355,13 +355,13 @@ class AddToShelfIntegrationTest(TestCase):
         items = BookshelfItem.objects.filter(book=self.book, bookshelf=bookshelf)
         self.assertEqual(items.count(), 1)
     
-    def test_add_to_shelf_backward_compatibility_integer_tag(self):
-        """Test that integer tag values still work for backward compatibility."""
+    def test_add_to_shelf_with_string_tag(self):
+        """Test that string tag values work correctly."""
         self.client.login(username='testuser', password='pass123')
         
         response = self.client.post(
             reverse('add_to_shelf', kwargs={'book_id': self.book.id}),
-            {'tag': '2'}  # String representation of integer
+            {'tag': BookshelfTag.READING}  # Use TextChoices value
         )
         
         # Should redirect to book_list
@@ -370,7 +370,7 @@ class AddToShelfIntegrationTest(TestCase):
         # Verify bookshelf and item were created with correct tag
         bookshelf = Bookshelf.objects.get(user=self.user)
         item = BookshelfItem.objects.get(book=self.book, bookshelf=bookshelf)
-        self.assertEqual(item.tag, BookshelfTag.READING)  # '2' should map to READING
+        self.assertEqual(item.tag, BookshelfTag.READING)
     
     def test_add_to_shelf_invalid_tag_handled_gracefully(self):
         """Test that invalid tag values are handled gracefully."""

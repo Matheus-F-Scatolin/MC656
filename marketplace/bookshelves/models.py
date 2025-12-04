@@ -24,7 +24,7 @@ class Bookshelf(models.Model):
         
         Args:
             book: The Book instance to add/update
-            tag: The tag value to assign to the book (string or integer for backward compatibility)
+            tag: The tag value to assign to the book (BookshelfTag choice value)
             actor: The user performing this action (optional, for future logging/permissions)
             
         Returns:
@@ -36,11 +36,8 @@ class Bookshelf(models.Model):
         if book is None:
             raise ValueError("Book cannot be None")
         
-        # Handle both integer and string values for backward compatibility
-        if isinstance(tag, int):
-            tag = str(tag)
-        elif not isinstance(tag, str):
-            raise ValueError("Tag must be a valid string or integer")
+        if not isinstance(tag, str):
+            raise ValueError("Tag must be a valid string")
         
         # Validate that the tag value is in the allowed choices
         valid_tag_values = [choice[0] for choice in BookshelfTag.choices]

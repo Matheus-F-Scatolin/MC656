@@ -25,11 +25,6 @@ def update_tag(request):
         try:
             item = BookshelfItem.objects.get(id=item_id, bookshelf__user=request.user)
             
-            # Handle both integer and string values for backward compatibility
-            if isinstance(new_tag, int):
-                # Convert integer to string for the new CharField
-                new_tag = str(new_tag)
-            
             # Validate that the tag value is valid
             if new_tag not in [choice[0] for choice in BookshelfTag.choices]:
                 return JsonResponse({'error': 'Invalid tag value'}, status=400)
