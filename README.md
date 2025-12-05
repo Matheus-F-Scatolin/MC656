@@ -1,24 +1,14 @@
-# MC656: Marketplace de Livros
+MC656: Marketplace de Livros
 
-## Arquitetura do Sistema
+#### Arquitetura do Sistema
 
-### Estilos Arquiteturais Adotados
+O projeto segue o padrão **Model-View-Template (MVT)** do Django. Este padrão é uma variação do MVC (Model-View-Controller) e naturalmente implementa a separação de responsabilidades em camadas. As responsabilidades no sistema são:
 
-O projeto **Marketplace de Livros** adota uma combinação de estilos arquiteturais que se complementam para criar uma aplicação web robusta:
+- **Model (Data / Data Access):** models do Django e o banco SQLite que persistem e validam os dados.  
+- **View (Business Logic):** views que processam requisições, aplicam regras de negócio e orquestram operações.  
+- **Template (Presentation):** templates, URLs e assets que cuidam da renderização e da interface do usuário.  
 
-#### 1. **Arquitetura em Camadas (Layering)**
-O sistema segue o padrão clássico de separação em camadas do Django framework:
-- **Camada de Apresentação (Presentation Layer)**: Templates HTML, views e URLs que gerenciam a interface do usuário
-- **Camada de Lógica de Negócio (Business Logic Layer)**: Views e models que implementam as regras de negócio da aplicação
-- **Camada de Acesso a Dados (Data Access Layer)**: Models do Django ORM que abstraem o acesso ao banco de dados
-- **Camada de Dados (Data Layer)**: Banco de dados SQLite que persiste as informações
-
-#### 2. **Model-View-Template (MVT)**
-Como uma variação do padrão MVC, o Django implementa o MVT:
-- **Model**: Define a estrutura dos dados (Book, User) e regras de negócio
-- **View**: Processa requisições, interage com models e retorna responses
-- **Template**: Responsável pela apresentação e renderização do HTML
-
+Em suma, usamos o MVT como arquitetura principal — não há outro estilo arquitetural sobreposto.
 ---
 Além disso, o projeto é organizado segundo o princípio de **Separação de Responsabilidades (Separation of Concerns)**, de forma que cada componente tem uma responsabilidade específica:
 - Models para definição de dados e regras de negócio
