@@ -8,7 +8,6 @@ O projeto segue o padrão **Model-View-Template (MVT)** do Django. Este padrão 
 - **View (Business Logic):** views que processam requisições, aplicam regras de negócio e orquestram operações.  
 - **Template (Presentation):** templates, URLs e assets que cuidam da renderização e da interface do usuário.  
 
-Em suma, usamos o MVT como arquitetura principal — não há outro estilo arquitetural sobreposto.
 ---
 Além disso, o projeto é organizado segundo o princípio de **Separação de Responsabilidades (Separation of Concerns)**, de forma que cada componente tem uma responsabilidade específica:
 - Models para definição de dados e regras de negócio
