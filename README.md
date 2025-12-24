@@ -1,67 +1,110 @@
-# MC656: Marketplace de Livros
+# Book Marketplace
 
-#### Arquitetura do Sistema
+## About the Project
 
-O projeto segue o padrão **Model-View-Template (MVT)** do Django. Este padrão é uma variação do MVC (Model-View-Controller) e naturalmente implementa a separação de responsabilidades em camadas. As responsabilidades no sistema são:
+Book Marketplace is a web platform developed with Django that connects university students for donating used books. The system allows users to register books with detailed information (title, author, course, ISBN), search the catalog using different strategies, manage personal bookshelves, and coordinate book exchanges and donations between users.
 
-- **Model (Data / Data Access):** models do Django e o banco SQLite que persistem e validam os dados.  
-- **View (Business Logic):** views que processam requisições, aplicam regras de negócio e orquestram operações.  
-- **Template (Presentation):** templates, URLs e assets que cuidam da renderização e da interface do usuário.  
+## How to Run
+
+### Prerequisites
+- Python 3.8 or higher
+- pip (Python package manager)
+
+### Installation and Setup
+
+1. Clone the repository:
+```bash
+git clone https://github.com/Matheus-F-Scatolin/MC656.git
+cd MC656/marketplace
+```
+
+2. Create and activate a virtual environment (recommended):
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+3. Install dependencies:
+```bash
+pip install -r requirements.txt
+# Or if using pyproject.toml:
+pip install -e .
+```
+
+4. Run database migrations:
+```bash
+python manage.py migrate
+```
+
+5. Start the development server:
+```bash
+python manage.py runserver
+```
+
+6. Access the application at `http://localhost:8000`
+
+## System Architecture
+
+The project follows Django's **Model-View-Template (MVT)** pattern. This pattern is a variation of MVC (Model-View-Controller) and naturally implements separation of concerns in layers. The responsibilities in the system are:
+
+- **Model (Data / Data Access):** Django models and the SQLite database that persist and validate data.  
+- **View (Business Logic):** views that process requests, apply business rules and orchestrate operations.  
+- **Template (Presentation):** templates, URLs and assets that handle rendering and user interface.  
 
 ---
-Além disso, o projeto é organizado segundo o princípio de **Separação de Responsabilidades (Separation of Concerns)**, de forma que cada componente tem uma responsabilidade específica:
-- Models para definição de dados e regras de negócio
-- Views para lógica de controle e processamento de requisições  
-- Templates para apresentação
-- URLs para roteamento de requisições
+Additionally, the project is organized according to the **Separation of Concerns** principle, so that each component has a specific responsibility:
+- Models for data definition and business rules
+- Views for control logic and request processing  
+- Templates for presentation
+- URLs for request routing
 
-Esta combinação de estilos arquiteturais proporciona:
-- **Escalabilidade**: Possibilidade de expansão modular
-- **Testabilidade**: Componentes isolados facilitam testes unitários
-- **Reusabilidade**: Módulos podem ser reutilizados em outros contextos
+This combination of architectural styles provides:
+- **Scalability**: Possibility of modular expansion
+- **Testability**: Isolated components facilitate unit testing
+- **Reusability**: Modules can be reused in other contexts
 
-### Diagramas C4 da Arquitetura
+### C4 Architecture Diagrams
 
-A arquitetura do sistema é representada através de diagramas C4 em três níveis de abstração:
+The system architecture is represented through C4 diagrams at three levels of abstraction:
 
-#### Nível 1 - Diagrama de Contexto
-O diagrama de contexto mostra a visão geral do sistema e seus usuários principais:
+#### Level 1 - Context Diagram
+The context diagram shows the system overview and its main users:
 
-![Diagrama C4 - Contexto](images/C4/C4_Context.drawio.png)
+![C4 Diagram - Context](images/C4/C4_Context.drawio.png)
 
-#### Nível 2 - Diagrama de Container
-O diagrama de container detalha os principais componentes tecnológicos do sistema:
+#### Level 2 - Container Diagram
+The container diagram details the main technological components of the system:
 
-![Diagrama C4 - Container](images/C4/C4_Container.drawio.png)
+![C4 Diagram - Container](images/C4/C4_Container.drawio.png)
 
-#### Nível 3 - Diagrama de Componente
-O diagrama de componente decompõe a Aplicação Web Django em seus módulos internos:
+#### Level 3 - Component Diagram
+The component diagram decomposes the Django Web Application into its internal modules:
 
-![Diagrama C4 - Componente](images/C4/C4_Component.drawio.png)
+![C4 Diagram - Component](images/C4/C4_Component.drawio.png)
 
-### Descrição dos Principais Componentes
+### Description of Main Components
 
 #### **Accounts Component**
-Módulo dedicado ao gerenciamento de usuários, incluindo landing page, cadastro, autenticação e controle de sessões. Implementa tanto interfaces web quanto APIs REST para operações de usuário.
+Module dedicated to user management, including landing page, registration, authentication and session control. Implements both web interfaces and REST APIs for user operations.
 
 #### **Books Component**
-Responsável por todo o ciclo de vida dos livros no marketplace: cadastro, listagem, busca avançada (por título, autor e curso) e gerenciamento do catálogo. Inclui interface administrativa para gestão de conteúdo.
+Responsible for the entire lifecycle of books in the marketplace: registration, listing, advanced search (by title, author and course) and catalog management. Includes administrative interface for content management.
 
 #### **Authentication Middleware**
-Sistema de segurança que protege rotas sensíveis, gerencia sessões de usuário e implementa validações de permissão através de decorators como `@login_required` e proteção CSRF.
+Security system that protects sensitive routes, manages user sessions and implements permission validations through decorators like `@login_required` and CSRF protection.
 
 #### **URL Router**
-Componente de roteamento que direciona requisições HTTP para os módulos apropriados, organizando tanto endpoints web quanto APIs REST de forma centralizada e hierárquica.
+Routing component that directs HTTP requests to appropriate modules, organizing both web endpoints and REST APIs in a centralized and hierarchical manner.
 
 #### **ORM Data Layer**
-Camada de abstração de dados que utiliza o Django ORM para interagir com o banco SQLite, gerenciando modelos User e Book, migrações de esquema e operações de consulta complexas.
+Data abstraction layer that uses Django ORM to interact with the SQLite database, managing User and Book models, schema migrations and complex query operations.
 
-### Books Component - Padrão de Projeto _Strategy_
-Usuários podem ter expectativas diferentes ao buscar livros: podem estar interessados em um único livro cujo título é conhecido, ou em qualquer livro relacionado a alguma disciplina, ou, ainda, apenas em livros relacionados a uma disciplina escritos por um determinado autor. Para atender a essas necessidades diversas, o componente Books adota diferentes estratégias de busca dependendo do contexto da pesquisa. O usuário pode escolher um tipo de busca por meio da interface da aplicação, e o componente Books identifica o contexto correspondente a partir do request HTTP. Por enquanto, foram criadas cinco estratégia, cada uma implementando sua própria lógica de busca:
-- *Title*: retorna livros cujo título corresponde à string informada pelo usuário;
-- *Author*: retorna livros cujo autor corresponde à string informada pelo usuário;
-- *Course*: retorna livros cujo curso ou disciplina corresponde à string informada pelo usuário;
-- *Combined*: retorna livros para os quais qualquer campo (título, autor ou curso) corresponde à string informada pelo usuário;
-- *Advanced*: retorna livros cujo título, autor e curso correspondem cada um a uma string diferente. Neste caso, é possível ignorar um ou mais campos informando uma string vazia (que corresponde a qualquer valor).
+### Books Component - _Strategy_ Design Pattern
+Users may have different expectations when searching for books: they may be interested in a single book whose title is known, or in any book related to a certain subject, or even only in books related to a subject written by a specific author. To meet these diverse needs, the Books component adopts different search strategies depending on the search context. The user can choose a search type through the application interface, and the Books component identifies the corresponding context from the HTTP request. So far, five strategies have been created, each implementing its own search logic:
+- *Title*: returns books whose title matches the string provided by the user;
+- *Author*: returns books whose author matches the string provided by the user;
+- *Course*: returns books whose course or subject matches the string provided by the user;
+- *Combined*: returns books for which any field (title, author or course) matches the string provided by the user;
+- *Advanced*: returns books whose title, author and course each match a different string. In this case, it is possible to ignore one or more fields by providing an empty string (which matches any value).
 
-Essa abordagem desacopla a implementação de cada estratégia do contexto, o que simplifica a criação de novas estratégias.
+This approach decouples the implementation of each strategy from the context, which simplifies the creation of new strategies.
