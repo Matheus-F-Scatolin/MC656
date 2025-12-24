@@ -1,8 +1,8 @@
-# Book Marketplace
+# BookExchangePlatform
 
 ## About the Project
 
-Book Marketplace is a web platform developed with Django that connects university students for donating used books. The system allows users to register books with detailed information (title, author, course, ISBN), search the catalog using different strategies, manage personal bookshelves, and coordinate book exchanges and donations between users.
+BookExchangePlatform is a web platform developed with Django that connects university students for donating used books. The system allows users to register books with detailed information (title, author, course, ISBN), search the catalog using different strategies, manage personal bookshelves, and coordinate book exchanges and donations between users.
 
 ## How to Run
 
@@ -14,8 +14,8 @@ Book Marketplace is a web platform developed with Django that connects universit
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/Matheus-F-Scatolin/MC656.git
-cd MC656/marketplace
+git clone https://github.com/Matheus-F-Scatolin/BookExchangePlatform.git
+cd BookExchangePlatform/marketplace
 ```
 
 2. Create and activate a virtual environment (recommended):
